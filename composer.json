@@ -1,0 +1,13 @@
+{
+    "name": "musa/perfectly-cache",
+    "description": "Laravel database cache package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Musa Kurt",
+            "email": "hackedtim61@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}

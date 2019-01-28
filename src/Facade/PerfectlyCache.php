@@ -8,8 +8,16 @@
 
 namespace Whtht\PerfectlyCache\Facade;
 
+use Illuminate\Support\Facades\Facade;
 
-class PerfectlyCache
+class PerfectlyCache extends Facade
 {
+    public static function getFacadeAccessor() {
+        return 'perfectly-cache';
+    }
+
+    public static function a() {
+        return "sd";
+    }
 
 }
