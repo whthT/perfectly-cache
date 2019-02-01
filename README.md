@@ -23,14 +23,14 @@ In your `config/app.php` add `Whtht\PerfectlyCache\PerfectlyCacheServiceProvider
 
 - Publish Configuration
 ````bash
-php artisan vendor:publish --provider=Whtht\PerfectlyCache\PerfectlyCacheServiceProvider
+php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServiceProvider"
 ````
 
 - Use trait on your models 
     >Add this code in your models / or add just your base model
 
 ```
-    use \Whtht\PerfectlyCache\Traits\PerfectlyCache;
+    use \Whtht\PerfectlyCache\Traits\PerfectCachable;
 ```
 like this
 ````php
