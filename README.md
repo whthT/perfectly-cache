@@ -6,13 +6,22 @@ It serves to cache and use any queries you make without having to make any chang
 
 ### Installing
 
-- Require package
-
+- Composer
+Execute the following command to get the latest version of the package:
 ```
 composer required whtht/perfectly-cache
 ```
 
-- Vendor publishing 
+In your `config/app.php` add `Whtht\PerfectlyCache\PerfectlyCacheServiceProvider::class` to the end of the `providers` array:
+
+```php
+'providers' => [
+    ...
+    Whtht\PerfectlyCache\PerfectlyCacheServiceProvider::class,
+],
+```
+
+- Publish Configuration
 ````bash
 php artisan vendor:publish --provider=Whtht\PerfectlyCache\PerfectlyCacheServiceProvider
 ````
@@ -98,7 +107,7 @@ return [
    
 ```
 
-## Example
+## Usage
 
 ````php
 // Basic cache
@@ -106,6 +115,12 @@ $results = \App\Category::find($id);
 
 // Basic cache skip
 $results = \App\Category::skipCache()->find($id);
+
+// Basic usage with eager load
+$results = \App\Category::with("_list_category_tags")->find($id);
+
+// Basic cache skip usage with eager load
+$results = \App\Category::with("^_list_category_tags")->find($id);
 
 ````
 
