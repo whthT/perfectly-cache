@@ -9,7 +9,7 @@ It serves to cache and use any queries you make without having to make any chang
 - Composer
 Execute the following command to get the latest version of the package:
 ```
-composer required whtht/perfectly-cache
+composer require whtht/perfectly-cache
 ```
 
 In your `config/app.php` add `Whtht\PerfectlyCache\PerfectlyCacheServiceProvider::class` to the end of the `providers` array:
