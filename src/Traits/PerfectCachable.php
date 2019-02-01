@@ -89,7 +89,7 @@ trait PerfectCachable
 
     public function controlForCache(string $event) {
 
-        $supportedEvents = config('perfectly-cache.events', ['created', 'updated', 'deleted']);
+        $supportedEvents = config('perfectly-cache.clear_events', ['created', 'updated', 'deleted']);
         if (in_array($event, $supportedEvents)) {
             self::reloadCache();
         }

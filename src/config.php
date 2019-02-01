@@ -7,20 +7,24 @@
  */
 
 return [
-    
-    "enabled" => true,
 
-    "minutes" => 30,
+    "enabled" => true, // Is cache enabled?
 
-    "events" => [
+    "minutes" => 30, // Cache minutes.
+
+    /**
+     * If this event is triggered on this model,
+     * the cache of that table is deleted.
+     */
+    "clear_events" => [
         "created",
         "updated",
         "deleted"
     ],
 
     "allowed" => [
-        "get" => true,
-        "first" => true
+        "get" => true, //Allow with 'get' function. (Eq: Model::get())
+        "first" => true // Allow with 'first' function. (Eq: Model::first(); Model::find(); Model::findOrFail() )
     ]
 
 ];
