@@ -30,7 +30,7 @@ php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServic
     >Add this code in your models / or add just your base model
 
 ```
-    use \Whtht\PerfectlyCache\Traits\PerfectlyCache;
+    use \Whtht\PerfectlyCache\Traits\PerfectCachable;
 ```
 like this
 ````php
