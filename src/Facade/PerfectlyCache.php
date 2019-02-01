@@ -62,10 +62,10 @@ class PerfectlyCache extends Facade
                     }));
 
 
-
-                    Cache::put($cacheKey, $results, config('perfectly-cache.minutes'));
-
-                    self::prepareForJsonOutput($cacheKey, $instance->from);
+                    if (!$cacheSkip) {
+                        Cache::put($cacheKey, $results, config('perfectly-cache.minutes'));
+                        self::prepareForJsonOutput($cacheKey, $instance->from);
+                    }
                 }
 
                 return $results;
