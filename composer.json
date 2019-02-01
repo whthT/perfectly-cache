@@ -2,12 +2,25 @@
     "name": "whtht/perfectly-cache",
     "description": "Laravel database cache package",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Musa Kurt",
-            "email": "hackedtim61@gmail.com"
-        }
-    ],
+    "authors": [{
+        "name": "Musa Kurt",
+        "email": "hackedtim61@gmail.com"
+    }],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Whtht\\PerfectlyCache\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Whtht\\PerfectlyCache\\PerfectlyCacheServiceProvider"
+            ],
+            "aliases": {
+                "PerfectlyCache": "Whtht\\PerfectlyCache\\Facade\\PerfectlyCache"
+            }
+        }
+    }
 }
