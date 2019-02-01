@@ -9,7 +9,7 @@ It serves to cache and use any queries you make without having to make any chang
 - Require package
 
 ```
-composer required whtht/perfectly-cache
+composer require whtht/perfectly-cache
 ```
 
 - Vendor publishing 
