@@ -9,7 +9,13 @@
 namespace Whtht\PerfectlyCache\Traits;
 
 
+use Whtht\PerfectlyCache\Facade\PerfectlyCache;
+
 trait BuildsQueries
 {
+    public function first($columns = ['*'])
+    {
+        return PerfectlyCache::first($columns, $this);
+    }
 
 }

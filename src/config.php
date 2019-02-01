@@ -7,5 +7,20 @@
  */
 
 return [
-    "a" => "b"
+    
+    "enabled" => true,
+
+    "minutes" => 30,
+
+    "events" => [
+        "created",
+        "updated",
+        "deleted"
+    ],
+
+    "allowed" => [
+        "get" => true,
+        "first" => true
+    ]
+
 ];

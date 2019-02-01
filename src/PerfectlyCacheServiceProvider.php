@@ -9,9 +9,12 @@ class PerfectlyCacheServiceProvider extends ServiceProvider {
 
     public function boot() {
         
+        $this->publishes([
+            __DIR__."/config.php" => config_path("perfectly-cache.php")
+        ]);
     }
 
     public function register() {
-        $this->mergeConfigFrom(__DIR__."/config.php", "perfectly-cache");
+        $this->mergeConfigFrom(__DIR__."/config.php", "perfectly-cache.php");
     }
 }

@@ -10,31 +10,21 @@ namespace Whtht\PerfectlyCache\Builders;
 
 
 use Whtht\PerfectlyCache\Facade\PerfectlyCache;
+use Illuminate\Database\Query\Builder;
 
-class Builder extends \Illuminate\Database\Query\Builder
+class QueryBuilder extends Builder
 {
-    protected $cacheSkip;
-    protected $eagerLoad;
+    public $cacheSkip;
+
+    public function getCacheSkip() {
+        return $this->cacheSkip;
+    }
+
     public function runSelect()
     {
         return $this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
-    }
-
-    public function eagerLoadRelations(array $models)
-    {
-        foreach ($this->eagerLoad as $name => $constraints) {
-            dd($name, $constraints);
-            // For nested eager loads we'll skip loading them here and they will be set as an
-            // eager load on the query to retrieve the relation so that they will be eager
-            // loaded on that query, because that is where they get hydrated as models.
-            if (strpos($name, '.') === false) {
-                $models = $this->eagerLoadRelation($models, $name, $constraints);
-            }
-        }
-
-        return $models;
     }
 
     public function onceWithColumns($columns, $callback)
@@ -67,6 +57,8 @@ class Builder extends \Illuminate\Database\Query\Builder
      */
     public function get($columns = ['*'])
     {
-        return PerfectlyCache::get($columns, $this, $this->cacheSkip);
+        $result = PerfectlyCache::get($columns, $this, $this->cacheSkip);
+        PerfectlyCache::saveToJson();
+        return $result;
     }
 }

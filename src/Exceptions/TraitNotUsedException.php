@@ -9,7 +9,27 @@
 namespace Whtht\PerfectlyCache\Exceptions;
 
 
-class TraitNotUsedException
+use Throwable;
+use Illuminate\Database\Query\Builder;
+
+class TraitNotUsedException extends \Exception
 {
+    protected $model;
+    public function __construct(Builder $builder)
+    {
+
+        parent::__construct();
+
+        $this->model = get_class($builder->getModel());
+
+
+        $this->message = "$this->model Model has no PerfectlyCache Trait! ";
+        $this->report();
+    }
+
+    public function report()
+    {
+        echo $this->message;
+    }
 
 }
