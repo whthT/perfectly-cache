@@ -15,15 +15,19 @@ use Illuminate\Database\Query\Builder;
 class TraitNotUsedException extends \Exception
 {
     protected $model;
-    public function __construct(Builder $builder)
+    public function __construct($builder)
     {
 
         parent::__construct();
+        try {
 
-        $this->model = get_class($builder->getModel());
+            $this->model = get_class($builder->getModel());
 
+            $this->message = "$this->model Model has no PerfectCachable Trait! Please check all models using by present query.";
+        }catch (\Exception $exception) {
+            $this->message = "Some models has not PerfectCachable Trait! Please check all models using by present query.";
+        }
 
-        $this->message = "$this->model Model has no PerfectlyCache Trait! ";
         $this->report();
     }
 

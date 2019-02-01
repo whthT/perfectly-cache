@@ -106,6 +106,18 @@ return [
     */
    
 ```
+- Skip in Model
+    >Manage your models with ``$isPerfectCachable`` variable.
+```php
+<?php
+namespace App;
+
+class Category extends BaseModel
+{
+    /* Cache disabled by this variable */
+    public $isPerfectCachable = false;
+}
+```
 
 ## Usage
 

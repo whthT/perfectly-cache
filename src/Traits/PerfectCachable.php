@@ -23,7 +23,7 @@ trait PerfectCachable
     {
         $connection = $this->getConnection();
         return new QueryBuilder(
-            $connection, $connection->getQueryGrammar(), $connection->getPostProcessor()
+            $connection, $connection->getQueryGrammar(), $connection->getPostProcessor(), $this->isPerfectCachable
         );
     }
 

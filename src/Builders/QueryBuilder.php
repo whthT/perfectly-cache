@@ -10,11 +10,21 @@ namespace Whtht\PerfectlyCache\Builders;
 
 
 use Whtht\PerfectlyCache\Facade\PerfectlyCache;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 
 class QueryBuilder extends Builder
 {
     public $cacheSkip;
+
+    public function __construct(ConnectionInterface $connection, Grammar $grammar = null, Processor $processor = null, ?bool $isPerfectCachable = true)
+    {
+        $this->skipCache(!$isPerfectCachable);
+
+        parent::__construct($connection, $grammar, $processor);
+    }
 
     public function getCacheSkip() {
         return $this->cacheSkip;
