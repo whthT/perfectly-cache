@@ -15,13 +15,12 @@ composer require whtht/perfectly-cache
 ```
 
 - Publish Configuration
-````bash
+```bash
 php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServiceProvider"
-````
+```
 
-- Use trait on your models 
-    >Add this code in your models / or add just your base model
-
+- Use trait on your models   
+    add this code in your models / or add just your base model
 ```
     use \Whtht\PerfectlyCache\Traits\PerfectCachable;
 ```
@@ -72,12 +71,12 @@ return [
 ````
 
 ## Cache Skipping
-- With Chain 
+- With Chain  
 ```php
     // ->skipCache();
     $result = Category::select("id", "name")->skipCache()->get();
 ```
-- With Eager Load
+- With Eager Load   
 ```php
     $results = Category::select("id", "name")->with([
         "_list_category_tags:id,category_id,name,slug"
