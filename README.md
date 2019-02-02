@@ -14,15 +14,6 @@ Execute the following command to get the latest version of the package:
 composer require whtht/perfectly-cache
 ```
 
-In your `config/app.php` add `Whtht\PerfectlyCache\PerfectlyCacheServiceProvider::class` to the end of the `providers` array:
-
-```php
-'providers' => [
-    ...
-    Whtht\PerfectlyCache\PerfectlyCacheServiceProvider::class,
-],
-```
-
 - Publish Configuration
 ````bash
 php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServiceProvider"
