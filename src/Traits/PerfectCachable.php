@@ -20,8 +20,6 @@ trait PerfectCachable
 {
     public $isPerfectCachable = true;
 
-    public $cacheMinutes = 0;
-
     protected function newBaseQueryBuilder()
     {
         $connection = $this->getConnection();
@@ -31,7 +29,7 @@ trait PerfectCachable
 
         $queryBuilder->isPerfectCachable = $this->getIsPerfectCachable();
 
-        if ($this->cacheMinutes > 0) {
+        if (isset($this->cacheMinutes) && $this->cacheMinutes > 0) {
             $queryBuilder->cacheRememberMinutes = $this->cacheMinutes;
         }
 
