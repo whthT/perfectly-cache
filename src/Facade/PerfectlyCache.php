@@ -43,6 +43,18 @@ class PerfectlyCache extends Facade
         return md5($sql);
     }
 
+    protected static function getProgressor($instance, $columns) {
+        return collect($instance->onceWithColumns($columns, function () use($instance) {
+            return $instance->processor->processSelect($instance, $instance->runSelect());
+        }));
+    }
+
+    /**
+     * @param array $columns
+     * @param null $instance
+     * @param bool $cacheSkip
+     * @return Collection|mixed
+     */
     public static function get($columns = ["*"], $instance = null, $cacheSkip = false) {
 
         if (!is_null($instance)) {
@@ -52,29 +64,20 @@ class PerfectlyCache extends Facade
                 $cacheKey = self::createCacheKey($cleanSql);
                 $cacheMinutes = $instance->cacheRememberMinutes > 0 ? $instance->cacheRememberMinutes : config('perfectly-cache.minutes');
 
-
-                if(
-                    self::isCacheEnabled() && // is cache config enabled on perfectly-cache configs
-                    self::hasCache($cacheKey) && // Cache allready exists.
-                    self::isCacheAllowed("get") && // is cache function allowed in perfetly-cache.allowed
-                    !$cacheSkip && // if cache not skipping
-                    $instance->isPerfectCachable // is active in model
+                if (
+                    self::isCacheEnabled() &&
+                    self::isCacheAllowed("get") &&
+                    !$cacheSkip &&
+                    $instance->isPerfectCachable
                 ) {
+                    $results = Cache::remember($cacheKey, $cacheMinutes, function() use($instance, $columns) {
+                        return self::getProgressor($instance, $columns);
+                    });
 
-                    $results = Cache::get($cacheKey); // get cache by key
+                    self::prepareForJsonOutput($cacheKey, $instance->from);
 
                 } else {
-
-                    /* Get query result on database */
-                    $results = collect($instance->onceWithColumns($columns, function () use($instance) {
-                        return $instance->processor->processSelect($instance, $instance->runSelect());
-                    }));
-
-                    if (!$cacheSkip && $instance->isPerfectCachable) {
-                        Cache::put($cacheKey, $results, $cacheMinutes);
-                        
-                        self::prepareForJsonOutput($cacheKey, $instance->from);
-                    }
+                    $results =  self::getProgressor($instance, $columns);
                 }
 
                 return $results;
