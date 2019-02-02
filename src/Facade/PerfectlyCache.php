@@ -35,6 +35,10 @@ class PerfectlyCache extends Facade
         return config()->get("perfectly-cache.enabled", false);
     }
 
+    public static function getCacheJsonFile() {
+        return @json_decode(@file_get_contents(storage_path("framework/cache/perfectly-cache.json")), true) ?? [];
+    }
+
     public static function createCacheKey($sql) {
         return md5($sql);
     }
@@ -46,25 +50,29 @@ class PerfectlyCache extends Facade
 
                 $cleanSql = self::mergeBindings($instance->toSql(), $instance->getBindings());
                 $cacheKey = self::createCacheKey($cleanSql);
+                $cacheMinutes = $instance->cacheRememberMinutes > 0 ? $instance->cacheRememberMinutes : config('perfectly-cache.minutes');
+
+
                 if(
-                    self::isCacheEnabled() &&
-                    self::hasCache($cacheKey) &&
-                    self::isCacheAllowed("get") &&
-                    !$cacheSkip &&
-                    $instance->isPerfectCachable
+                    self::isCacheEnabled() && // is cache config enabled on perfectly-cache configs
+                    self::hasCache($cacheKey) && // Cache allready exists.
+                    self::isCacheAllowed("get") && // is cache function allowed in perfetly-cache.allowed
+                    !$cacheSkip && // if cache not skipping
+                    $instance->isPerfectCachable // is active in model
                 ) {
 
-                    $results = Cache::get($cacheKey);
+                    $results = Cache::get($cacheKey); // get cache by key
 
                 } else {
 
+                    /* Get query result on database */
                     $results = collect($instance->onceWithColumns($columns, function () use($instance) {
                         return $instance->processor->processSelect($instance, $instance->runSelect());
                     }));
 
-
                     if (!$cacheSkip && $instance->isPerfectCachable) {
-                        Cache::put($cacheKey, $results, config('perfectly-cache.minutes'));
+                        Cache::put($cacheKey, $results, $cacheMinutes);
+                        
                         self::prepareForJsonOutput($cacheKey, $instance->from);
                     }
                 }
@@ -90,8 +98,11 @@ class PerfectlyCache extends Facade
         self::$outputForJson[$table][] = $cacheKey;
     }
 
-    public static function saveToJson() {
-        if (filled(static::$outputForJson)) {
+    public static function saveToJson(array $saveJson = []) {
+
+        $json = filled($saveJson) ? $saveJson : static::$outputForJson;
+
+        if (filled($json)) {
             $filePath = storage_path("framework/cache/perfectly-cache.json");
 
             if (file_exists($filePath)) {
@@ -101,7 +112,7 @@ class PerfectlyCache extends Facade
                 $jsonList = [];
             }
 
-            foreach (self::$outputForJson as $key => $value) {
+            foreach ($json as $key => $value) {
                 if (!isset($jsonList[$key])) {
                     $jsonList[$key] = [];
                 }

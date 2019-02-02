@@ -121,6 +121,39 @@ class Category extends BaseModel
 }
 ```
 
+## Cache Time Adjustments
+You can set cache time in config (``perfectly-cache.minutes``)  
+You can specify globally from the model or directly during the query as you can apply to all models by editing them from the settings.
+The cache time can be edited in the query, in the model, and in the settings.
+
+- In Config
+```php
+...
+"minutes" => 30,
+
+```
+- In Model ``$cacheMinutes``
+```php
+<?php
+
+namespace App;
+
+
+class Module extends BaseModel
+{
+    protected $table = "modules";
+
+    public $cacheMinutes = 20; // Now cache time 20 minutes.
+}
+```
+
+- In Query ``->remember(:minutes)``
+
+```php
+$modules = \App\Module::remember(10)->select("id", "name")->get();
+```
+This query will be cached for 10 minutes.
+
 ## Usage
 
 ````php

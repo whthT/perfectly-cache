@@ -14,10 +14,13 @@ use Whtht\PerfectlyCache\Builders\EloquentBuilder;
 use Whtht\PerfectlyCache\Facade\PerfectlyCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 trait PerfectCachable
 {
     public $isPerfectCachable = true;
+
+    public $cacheMinutes = 0;
 
     protected function newBaseQueryBuilder()
     {
@@ -27,6 +30,10 @@ trait PerfectCachable
         );
 
         $queryBuilder->isPerfectCachable = $this->getIsPerfectCachable();
+
+        if ($this->cacheMinutes > 0) {
+            $queryBuilder->cacheRememberMinutes = $this->cacheMinutes;
+        }
 
         return $queryBuilder;
     }
@@ -57,18 +64,13 @@ trait PerfectCachable
     }
 
     public function getCacheJson() {
-        $path = storage_path($this->jsonPath);
+        $path = storage_path("framework/cache/perfectly-cache.json");
         if(file_exists($path)) {
             $file = json_decode(file_get_contents($path), true);
 
             return !is_array($file) || is_null($file) ? [] : $file;
         }
         return [];
-    }
-
-    public function saveJson(array $content) {
-        $path = storage_path($this->jsonPath);
-        file_put_contents($path, json_encode($content));
     }
 
     public function reloadCache()
@@ -90,7 +92,7 @@ trait PerfectCachable
         }
 
         if ($has_action) {
-            $this->saveJson($json);
+            PerfectlyCache::saveToJson($json);
         }
 
     }

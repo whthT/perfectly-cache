@@ -18,9 +18,18 @@ use Illuminate\Database\Query\Processors\Processor;
 class QueryBuilder extends Builder
 {
     public $cacheSkip;
+    public $cacheRememberMinutes = 0;
 
     public function getCacheSkip() {
         return $this->cacheSkip;
+    }
+
+    public function remember(int $minutes = 30) {
+        if($minutes <= 0) {
+            $minutes = 30;
+        }
+
+        $this->cacheRememberMinutes = $minutes;
     }
 
     public function runSelect()

@@ -33,8 +33,9 @@ class EloquentBuilder extends Builder
         foreach ($this->eagerLoad as $name => $constraints) {
 
             $skipCache = false;
-            if(strpos($name, '^') !== false) {
-                $name = str_replace('^', '', $name);
+
+            if(substr($name, 0, 1) == "^") {
+                $name = substr($name, 1, strlen($name));
                 $skipCache = true;
             }
 
