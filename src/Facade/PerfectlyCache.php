@@ -50,7 +50,8 @@ class PerfectlyCache extends Facade
                     self::isCacheEnabled() &&
                     self::hasCache($cacheKey) &&
                     self::isCacheAllowed("get") &&
-                    !$cacheSkip
+                    !$cacheSkip &&
+                    $instance->isPerfectCachable
                 ) {
 
                     $results = Cache::get($cacheKey);
@@ -62,7 +63,7 @@ class PerfectlyCache extends Facade
                     }));
 
 
-                    if (!$cacheSkip) {
+                    if (!$cacheSkip && $instance->isPerfectCachable) {
                         Cache::put($cacheKey, $results, config('perfectly-cache.minutes'));
                         self::prepareForJsonOutput($cacheKey, $instance->from);
                     }

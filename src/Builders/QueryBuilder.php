@@ -19,13 +19,6 @@ class QueryBuilder extends Builder
 {
     public $cacheSkip;
 
-    public function __construct(ConnectionInterface $connection, Grammar $grammar = null, Processor $processor = null, ?bool $isPerfectCachable = true)
-    {
-        $this->skipCache(!$isPerfectCachable);
-
-        parent::__construct($connection, $grammar, $processor);
-    }
-
     public function getCacheSkip() {
         return $this->cacheSkip;
     }

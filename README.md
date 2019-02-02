@@ -4,6 +4,8 @@ Laravel eloquent query cache package.
 
 It serves to cache and use any queries you make without having to make any changes to the database, system, or queries.
 
+PerfectlyCache automatically redirects the same query to the model when you need the same query by caching the results of the queries you make over the model.
+
 ### Installing
 
 - Composer
@@ -135,6 +137,18 @@ $results = \App\Category::with("_list_category_tags")->find($id);
 $results = \App\Category::with("^_list_category_tags")->find($id);
 
 ````
+
+## Notice
+
+If you already used time on your queries and this query will be cached, like this,
+```php
+$modules2 = Module::select("id", "name")
+    ->where("created_time_unix", ">=", time())
+    ->get();
+```
+
+You need to be add ``->skipCache()`` method on this query.   
+Because: This query will create a different cache each time it runs.
 
 ## License
 

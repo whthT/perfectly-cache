@@ -18,13 +18,21 @@ use Illuminate\Support\Facades\Log;
 trait PerfectCachable
 {
     public $isPerfectCachable = true;
-    protected $jsonPath = 'framework/cache/perfectly-cache.json';
+
     protected function newBaseQueryBuilder()
     {
         $connection = $this->getConnection();
-        return new QueryBuilder(
-            $connection, $connection->getQueryGrammar(), $connection->getPostProcessor(), $this->isPerfectCachable
+        $queryBuilder =  new QueryBuilder(
+            $connection, $connection->getQueryGrammar(), $connection->getPostProcessor()
         );
+
+        $queryBuilder->isPerfectCachable = $this->getIsPerfectCachable();
+
+        return $queryBuilder;
+    }
+
+    protected function getIsPerfectCachable() {
+        return $this->isPerfectCachable;
     }
 
     public function newEloquentBuilder($query)

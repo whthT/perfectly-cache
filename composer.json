@@ -17,10 +17,7 @@
         "laravel": {
             "providers": [
                 "Whtht\\PerfectlyCache\\PerfectlyCacheServiceProvider"
-            ],
-            "aliases": {
-                "PerfectlyCache": "Whtht\\PerfectlyCache\\Facade\\PerfectlyCache"
-            }
+            ]
         }
     }
 }
