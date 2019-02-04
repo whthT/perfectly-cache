@@ -35,7 +35,6 @@ class PerfectlyCacheServiceProvider extends ServiceProvider {
 
     public function listens()
     {
-        dd($this->listen);
         return $this->listen;
     }
 }

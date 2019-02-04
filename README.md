@@ -145,6 +145,14 @@ $modules = \App\Module::remember(10)->select("id", "name")->get();
 ```
 This query will be cached for 10 minutes.
 
+- In Eager Load
+```php
+$modules = \App\Module::with([
+    "(10)categories:id,name,module_id"
+])->select("id", "name")->get();
+// Categories will be cached for 10 minutes.
+```
+
 ## Usage
 
 ````php
