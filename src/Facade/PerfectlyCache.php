@@ -72,7 +72,6 @@ class PerfectlyCache extends Facade
                 ) {
                     $results = Cache::remember($cacheKey, $cacheMinutes, function() use($instance, $columns, $cacheKey, $cacheMinutes) {
                         self::prepareForJsonOutput($cacheKey, $instance->from);
-                        echo $instance->from. " tablosu $cacheMinutes dakikalığına önbelleğe alındı.\n";
                         return self::getProgressor($instance, $columns);
                     });
 
