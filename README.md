@@ -154,7 +154,7 @@ $modules = \App\Module::with([
 
 ## Usage
 
-````php
+```php
 // Basic cache
 $results = \App\Category::find($id);
 
@@ -167,7 +167,16 @@ $results = \App\Category::with("_list_category_tags")->find($id);
 // Basic cache skip usage with eager load
 $results = \App\Category::with("^_list_category_tags")->find($id);
 
-````
+```
+
+## Programmatically Cache Reloading
+If you want to refresh the query logically, you can use `` ->reloadCache() `` as follows.
+```php
+$module = Module::select("id", "name", "need_cache_reload")->first();
+if($module->need_cache_reload) { // simple true value
+    $module->reloadCache();
+}
+```
 
 ## Notice
 

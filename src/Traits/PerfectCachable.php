@@ -71,6 +71,9 @@ trait PerfectCachable
         return [];
     }
 
+    /**
+     * @return $this
+     */
     public function reloadCache()
     {
         $json = $this->getCacheJson();
@@ -93,10 +96,11 @@ trait PerfectCachable
             PerfectlyCache::saveToJson($json);
         }
 
+        return $this;
+
     }
 
     public function controlForCache(string $event) {
-
         $supportedEvents = config('perfectly-cache.clear_events', ['created', 'updated', 'deleted']);
         if (in_array($event, $supportedEvents)) {
             self::reloadCache();
