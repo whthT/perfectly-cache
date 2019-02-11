@@ -21,7 +21,7 @@ php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServic
 
 - Use trait on your models   
     add this code in your models / or add just your base model
-```
+```php
     use \Whtht\PerfectlyCache\Traits\PerfectCachable;
 ```
 like this
