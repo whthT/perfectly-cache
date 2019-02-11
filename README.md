@@ -25,7 +25,7 @@ php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServic
     use \Whtht\PerfectlyCache\Traits\PerfectCachable;
 ```
 like this
-````php
+```php
 <?php
 
 namespace App;
@@ -38,12 +38,12 @@ class BaseModel extends Model
     use PerfectCachable;
 }
 
-````
+```
 
 All database queries you make through this model will be cached and will be read from the cache instead of the database when needed.
 
 ## Configuration
-````php
+```php
 // config('perfectly-cache.(name)')
 // Eq: config('perfecyly-cache.enabled')
 return [
@@ -68,7 +68,7 @@ return [
     ]
 
 ];
-````
+```
 
 ## Cache Skipping
 - With Chain  
