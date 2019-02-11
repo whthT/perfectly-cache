@@ -20,7 +20,7 @@ php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServic
 ```
 
 - Use trait on your models   
-    add this code in your models / or add just your base model like this
+    add this code in your models / or add just your base model like this   
 ```php
 <?php
 namespace App;
