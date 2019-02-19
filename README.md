@@ -10,7 +10,7 @@ PerfectlyCache automatically redirects the same query to the model when you need
 
 - Composer
 Execute the following command to get the latest version of the package:
-```
+```bash
 composer require whtht/perfectly-cache
 ```
 
@@ -20,30 +20,26 @@ php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServic
 ```
 
 - Use trait on your models   
-    add this code in your models / or add just your base model
-```
-    use \Whtht\PerfectlyCache\Traits\PerfectCachable;
-```
-like this
-````php
+    add this code in your models / or add just your base model like this   
+```php
 <?php
-
 namespace App;
 
-use Whtht\PerfectlyCache\Traits\PerfectCachable;
 use Illuminate\Database\Eloquent\Model;
+
+use Whtht\PerfectlyCache\Traits\PerfectCachable;
 
 class BaseModel extends Model
 {
     use PerfectCachable;
 }
 
-````
+```
 
 All database queries you make through this model will be cached and will be read from the cache instead of the database when needed.
 
 ## Configuration
-````php
+```php
 // config('perfectly-cache.(name)')
 // Eq: config('perfecyly-cache.enabled')
 return [
@@ -72,7 +68,7 @@ return [
     "debug" => true
 
 ];
-````
+```
 
 ## Cache Skipping
 - With Chain  
