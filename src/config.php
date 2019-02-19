@@ -25,6 +25,10 @@ return [
     "allowed" => [
         "get" => true, //Allow with 'get' function. (Eq: Model::get())
         "first" => true // Allow with 'first' function. (Eq: Model::first(); Model::find(); Model::findOrFail() )
-    ]
+    ],
+    /**
+     * If debug mode is off, it does not show any error.
+     */
+    "debug" => true
 
 ];

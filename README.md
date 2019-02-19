@@ -65,7 +65,11 @@ return [
     "allowed" => [
         "get" => true, // Allow with 'get' function. (Eq: Model::get())
         "first" => true // Allow with 'first' function. (Eq: Model::first(); Model::find(); Model::findOrFail() )
-    ]
+    ],
+    /**
+     * If debug mode is off, it does not show any error.
+     */
+    "debug" => true
 
 ];
 ````
@@ -176,6 +180,21 @@ $module = Module::select("id", "name", "need_cache_reload")->first();
 if($module->need_cache_reload) { // simple true value
     $module->reloadCache();
 }
+```
+
+## Debug Mode
+If you enable debug mode from the ``perfectly-cache`` settings, you will make PerfectlyCache Exception visible.
+```php
+/**
+ * If debug mode is off, it does not show any error.
+ */
+"debug" => true
+```
+
+Eq:
+```php
+Whtht\PerfectlyCache\Exceptions\TraitNotUsedException   
+App\Location Model has no PerfectCachable Trait! Please check all models using by present query.
 ```
 
 ## Notice

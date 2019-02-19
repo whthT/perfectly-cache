@@ -30,9 +30,9 @@ class EloquentBuilder extends Builder
      */
     public function eagerLoadRelations(array $models)
     {
-        
+
         foreach ($this->eagerLoad as $name => $constraints) {
-            
+
             $skipCache = false;
             $cacheMinutes = 0;
 
@@ -68,11 +68,12 @@ class EloquentBuilder extends Builder
     {
         $relation = $this->getRelation($name);
 
-        if ( ! ($relation->getQuery()) instanceof EloquentBuilder) {
+        if(config('perfectly-cache.debug', false) && ! ($relation->getQuery()) instanceof EloquentBuilder) {
             //Trait not used exception
             throw (new TraitNotUsedException($relation->getQuery()));
+        }
 
-        } else {
+        if($relation->getQuery() instanceof EloquentBuilder) {
             $relation->getQuery()->skipCache($skipCache);
             if($cacheMinutes) {
                 $relation->getQuery()->remember($cacheMinutes);
