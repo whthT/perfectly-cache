@@ -69,8 +69,13 @@ class QueryBuilder extends Builder
      */
     public function get($columns = ['*'])
     {
-        $result = PerfectlyCache::get($columns, $this, $this->cacheSkip);
-        PerfectlyCache::saveToJson();
+        if(PerfectlyCache::isCacheEnabled()) {
+            $result = PerfectlyCache::get($columns, $this, $this->cacheSkip);
+            PerfectlyCache::saveToJson();
+        } else {
+            $result = parent::get($columns);
+        }
+
         return $result;
     }
 }

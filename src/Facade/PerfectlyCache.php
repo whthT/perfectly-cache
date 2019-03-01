@@ -23,10 +23,6 @@ class PerfectlyCache extends Facade
         return 'perfectly-cache';
     }
 
-    public static function hasCache($key) {
-        return Cache::has($key);
-    }
-
     public static function isCacheAllowed($func) {
         return config()->get("perfectly-cache.allowed.".$func, false);
     }
@@ -50,6 +46,19 @@ class PerfectlyCache extends Facade
     }
 
     /**
+     * @param $key
+     * @param $callback
+     */
+    public static function remember($key, $callback) {
+        if (filled(config("perfectly-cache.caching.$key"))) {
+            return config("perfectly-cache.caching.$key");
+        }
+        $result = $callback();
+        config()->set("perfectly-cache.caching.$key", $result);
+        return $result;
+    }
+
+    /**
      * @param array $columns
      * @param null $instance
      * @param bool $cacheSkip
@@ -70,9 +79,11 @@ class PerfectlyCache extends Facade
                     !$cacheSkip &&
                     $instance->isPerfectCachable
                 ) {
-                    $results = Cache::remember($cacheKey, $cacheMinutes, function() use($instance, $columns, $cacheKey, $cacheMinutes) {
-                        self::prepareForJsonOutput($cacheKey, $instance->from);
-                        return self::getProgressor($instance, $columns);
+                    $results = self::remember($cacheKey, function() use($cacheKey, $cacheMinutes, $cacheSkip, $instance, $columns) {
+                        return Cache::remember($cacheKey, $cacheMinutes, function() use($instance, $columns, $cacheKey, $cacheMinutes) {
+                            self::prepareForJsonOutput($cacheKey, $instance->from);
+                            return self::getProgressor($instance, $columns);
+                        });
                     });
 
                 } else {

@@ -15,7 +15,11 @@ trait BuildsQueries
 {
     public function first($columns = ['*'])
     {
-        return PerfectlyCache::first($columns, $this);
+        if (PerfectlyCache::isCacheEnabled()) {
+            return PerfectlyCache::first($columns, $this);
+        } else {
+            return parent::first($columns);
+        }
     }
 
 }

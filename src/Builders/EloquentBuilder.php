@@ -68,10 +68,10 @@ class EloquentBuilder extends Builder
     {
         $relation = $this->getRelation($name);
 
-        if(config('perfectly-cache.debug', false) && ! ($relation->getQuery()) instanceof EloquentBuilder) {
-            //Trait not used exception
-            throw (new TraitNotUsedException($relation->getQuery()));
-        }
+//        if(config('perfectly-cache.debug', false) && ! ($relation->getQuery()) instanceof EloquentBuilder) {
+//            //Trait not used exception
+//            throw (new TraitNotUsedException($relation->getQuery()));
+//        }
 
         if($relation->getQuery() instanceof EloquentBuilder) {
             $relation->getQuery()->skipCache($skipCache);
