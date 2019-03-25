@@ -39,16 +39,39 @@ class PerfectlyStore implements PerfectlyStoreInterface
     public function get($key)
     {
         if ($this->exists($key)) {
-            return PerfectlyCache::uncompressOutput($this->filesystem->get($this->getCacheFile($key)));
+            if ($this->existsInConfig($key)) {
+
+                return $this->getFromConfig($key);
+
+            }
+
+            $result = PerfectlyCache::uncompressOutput($this->filesystem->get($this->getCacheFile($key)));
+
+            config()->set('perfectly-cache.caching.'.$key, $result);
+
+            return $result;
         }
 
         return null;
+    }
+
+    public function existsInConfig(string $key) {
+        return config('perfectly-cache.caching.'.$key) ? true : false;
+    }
+
+    public function getFromConfig(string $key) {
+        return config('perfectly-cache.caching.'.$key);
     }
 
     /**
      * @param boolean
      */
     public function exists(string $key) {
+
+        if ($this->existsInConfig($key)) {
+            return true;
+        }
+
         return $this->filesystem->exists($this->getCacheFile($key));
     }
 
@@ -75,6 +98,7 @@ class PerfectlyStore implements PerfectlyStoreInterface
 
     public function put($key, $value, $seconds)
     {
+        config()->set('perfectly-cache.caching.'.$key, $value);
 
         $value = PerfectlyCache::compressOutput($value);
 

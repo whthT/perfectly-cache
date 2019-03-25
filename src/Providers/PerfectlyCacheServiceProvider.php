@@ -10,7 +10,6 @@ namespace Whtht\PerfectlyCache\Providers;
 
 use Whtht\PerfectlyCache\Extensions\PerfectlyStore;
 use Whtht\PerfectlyCache\PerfectlyCache;
-use Illuminate\Cache\Events\KeyWritten;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -67,6 +66,8 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
         /**
          * Register cachind array for minimize duplicate cache hits
          */
+
+        config()->set('perfectly-cache.caching', []);
 
         config()->set('cache.stores.'.$this->cacheStore, [
             'driver' => $this->cacheStore

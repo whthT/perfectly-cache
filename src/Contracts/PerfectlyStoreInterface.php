@@ -42,7 +42,19 @@ interface PerfectlyStoreInterface extends Store
     public function exists(string $key);
 
     /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getFromConfig(string $key);
+
+    /**
      * @return string
      */
     public function getDirectory();
+
+    /**
+     * @param string $key
+     * @return boolean
+     */
+    public function existsInConfig(string $key);
 }
