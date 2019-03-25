@@ -72,22 +72,31 @@ class PerfectlyCacheListCommand extends Command
 
             $split = explode('_', $name);
 
-            if (!array_key_exists($split[0], $list)) {
-                $list[$split[0]] = [];
+            if (isset($split[0]) && isset($split[1])) {
+
+                if (!array_key_exists($split[0], $list)) {
+                    $list[$split[0]] = [];
+                }
+
+
+                $deadTime = explode('.', $split[1]);
+                if (count($deadTime) && isset($deadTime[1])) {
+                    $deadTime = $deadTime[1];
+                } else {
+                    $deadTime = 30;
+                }
+
+                $createdDate = Carbon::parse($file->getCTime());
+
+                $list[] = [
+                    $split[0],
+                    $createdDate->toDateTimeString(),
+                    $createdDate->diffForHumans(),
+                    $createdDate->addMinutes($deadTime)->toDateTimeString(),
+                    $createdDate->diffForHumans(),
+                    $this->formatBytes($file->getSize())
+                ];
             }
-
-            $deadTime = explode('.', $split[1])[1];
-
-            $createdDate = Carbon::parse($file->getCTime());
-
-            $list[] = [
-                $split[0],
-                $createdDate->toDateTimeString(),
-                $createdDate->diffForHumans(),
-                $createdDate->addMinutes($deadTime)->toDateTimeString(),
-                $createdDate->diffForHumans(),
-                $this->formatBytes($file->getSize())
-            ];
         }
         $this->table([
             'Table', 'Created At', 'Created At For Humans', 'Dead At', 'Dead At For Humans', 'Size'
