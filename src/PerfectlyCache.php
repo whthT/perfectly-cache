@@ -97,9 +97,20 @@ class PerfectlyCache
         return collect(json_decode($data, true));
     }
 
+    /**
+     * @param string $table
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
     public static function clearCacheByTable(string $table) {
         $store = config('perfectly-cache.cache-store', 'perfectly-cache');
 
         Cache::store($store)->deleteMultiple([$table]);
     }
+
+    public static function clearAllCaches() {
+        $store = config('perfectly-cache.cache-store', 'perfectly-cache');
+
+        Cache::store($store)->forgetAll();
+    }
+
 }

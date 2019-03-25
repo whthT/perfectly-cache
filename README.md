@@ -175,6 +175,15 @@ if($module->need_cache_reload) { // simple true value
 }
 ```
 
+## Commands
+```bash
+# Clear all caches.
+php artisan perfectly-cache:clear
+
+#Clear all users table caches
+php artisan perfectly-cache:clear users
+```
+
 ## Debug Mode
 If you enable debug mode from the ``perfectly-cache`` settings, you will make PerfectlyCache Exception visible.
 ```php

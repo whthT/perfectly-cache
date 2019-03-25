@@ -9,17 +9,17 @@
 namespace Whtht\PerfectlyCache\Commands;
 
 
-use Whtht\PerfectlyCache\Facades\PerfectlyCache;
+use Whtht\PerfectlyCache\PerfectlyCache;
 use Illuminate\Console\Command;
 
-class PerfectlyCacheCommand extends Command
+class PerfectlyCacheClearCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'perfectly-cache:clear';
+    protected $signature = 'perfectly-cache:clear {table?}';
 
     /**
      * The console command description.
@@ -42,9 +42,20 @@ class PerfectlyCacheCommand extends Command
      * Execute the console command.
      *
      * @return mixed
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function handle()
     {
-        PerfectlyCache::clearAllCaches();
+        if ($table = $this->argument('table')) {
+            $this->info("[PerfectlyCache] Clear progress: $table");
+
+            PerfectlyCache::clearCacheByTable($table);
+
+        } else {
+            $this->info("[PerfectlyCache] Clearing all caches..");
+            PerfectlyCache::clearAllCaches();
+        }
+
+        $this->info("[PerfectlyCache] Cache clearing completed. [OK]");
     }
 }

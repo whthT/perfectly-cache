@@ -136,6 +136,21 @@ class PerfectlyStore implements PerfectlyStoreInterface
         return true;
     }
 
+    /**
+     *@return boolean
+     */
+    public function forgetAll() {
+        $pass = true;
+
+        foreach ($this->filesystem->allFiles($this->getDirectory()->path('')) as $file) {
+            if (! $this->filesystem->delete($file)) {
+                $pass = false;
+            }
+        }
+
+        return $pass;
+    }
+
     public function flush()
     {
         // TODO: Implement flush() method.

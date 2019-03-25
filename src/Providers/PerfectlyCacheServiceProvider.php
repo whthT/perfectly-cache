@@ -8,6 +8,7 @@
 
 namespace Whtht\PerfectlyCache\Providers;
 
+use Whtht\PerfectlyCache\Commands\PerfectlyCacheClearCommand;
 use Whtht\PerfectlyCache\Extensions\PerfectlyStore;
 use Whtht\PerfectlyCache\PerfectlyCache;
 
@@ -29,6 +30,7 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
         $this->registerAlias();
         $this->publish();
         $this->registerCacheStore();
+        $this->registerCommands();
     }
 
     public function register()
@@ -84,5 +86,13 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
         Cache::extend($this->cacheStore, function() {
             return Cache::repository(new PerfectlyStore);
         });
+    }
+
+    protected function registerCommands() {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PerfectlyCacheClearCommand::class
+            ]);
+        }
     }
 }
