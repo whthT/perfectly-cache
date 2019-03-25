@@ -182,6 +182,9 @@ php artisan perfectly-cache:clear
 
 #Clear all users table caches
 php artisan perfectly-cache:clear users
+
+#Show cache details
+php artisan perfectly-cache:list
 ```
 
 ## Debug Mode
