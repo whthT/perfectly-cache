@@ -19,5 +19,10 @@
                 "Whtht\\PerfectlyCache\\Providers\\PerfectlyCacheServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php artisan perfectly-cache:clear"
+        ]
     }
 }
