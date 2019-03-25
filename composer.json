@@ -16,7 +16,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Whtht\\PerfectlyCache\\PerfectlyCacheServiceProvider"
+                "Whtht\\PerfectlyCache\\Providers\\PerfectlyCacheServiceProvider",
+                "Whtht\\PerfectlyCache\\Providers\\PerfectlyCacheStoreProvider"
             ]
         }
     }

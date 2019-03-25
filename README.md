@@ -16,7 +16,7 @@ composer require whtht/perfectly-cache
 
 - Publish Configuration
 ```bash
-php artisan vendor:publish --provider="Whtht\PerfectlyCache\PerfectlyCacheServiceProvider"
+php artisan vendor:publish --provider="Whtht\PerfectlyCache\Providers\PerfectlyCacheServiceProvider"
 ```
 
 - Use trait on your models   
@@ -27,11 +27,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use Whtht\PerfectlyCache\Traits\PerfectCachable;
+use Whtht\PerfectlyCache\Traits\PerfectlyCachable;
 
-class BaseModel extends Model
+class User extends Model
 {
-    use PerfectCachable;
+    use PerfectlyCachable;
 }
 
 ```
@@ -65,7 +65,12 @@ return [
     /**
      * If debug mode is off, it does not show any error.
      */
-    "debug" => true
+    "debug" => true,
+    
+    /**
+     * Cache store directory, store name, config name, etc. names
+     */
+    'cache-store' => 'perfectly-cache',
 
 ];
 ```
@@ -77,29 +82,21 @@ return [
     $result = Category::select("id", "name")->skipCache()->get();
 ```
 - With Eager Load   
-```php
-    $results = Category::select("id", "name")->with([
-        "_list_category_tags:id,category_id,name,slug"
-    ])->find($id);
-    /**
-     * 2 cache will be generated in this query.
-     * For the first cache categories table,
-     * the second cache will occur for the list of categories of labels.
-    */ 
-    
+```php    
     /**
     * Thanks to the ^ sign, you can prevent your relationships from being cached.
     */
     $results = Category::select("id", "name")->with([
         "^_list_category_tags:id,category_id,name,slug"
     ])->find($id);
+    
     /**
     * It will no longer be hidden in the cache for the tag table of the categories.
     */
    
 ```
 - Skip in Model
-    >Manage your models with ``$isPerfectCachable`` variable.
+    >Manage your models with ``$isCacheEnable`` variable.
 ```php
 <?php
 namespace App;
@@ -107,7 +104,7 @@ namespace App;
 class Category extends BaseModel
 {
     /* Cache disabled by this variable */
-    public $isPerfectCachable = false;
+    protected $isCacheEnable = false;
 }
 ```
 
@@ -185,12 +182,6 @@ If you enable debug mode from the ``perfectly-cache`` settings, you will make Pe
  * If debug mode is off, it does not show any error.
  */
 "debug" => true
-```
-
-Eq:
-```php
-Whtht\PerfectlyCache\Exceptions\TraitNotUsedException   
-App\Location Model has no PerfectCachable Trait! Please check all models using by present query.
 ```
 
 ## Notice

@@ -2,32 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: Musa
- * Date: 31.01.2019
- * Time: 18:33
+ * Date: 24.03.2019
+ * Time: 14:07
  */
 
 namespace Whtht\PerfectlyCache\Builders;
 
 
-use Whtht\PerfectlyCache\Exceptions\TraitNotUsedException;
-use Whtht\PerfectlyCache\Traits\BuildsQueries;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Log;
 
 class EloquentBuilder extends Builder
 {
-
-    use BuildsQueries;
-    /**
-     * @var array
-     */
-    protected $eagerLoad = [];
-
-    /**
-     * @param array $models
-     * @return array
-     * @throws TraitNotUsedException
-     */
     public function eagerLoadRelations(array $models)
     {
 
@@ -61,22 +46,19 @@ class EloquentBuilder extends Builder
      * @param string $name
      * @param \Closure $constraints
      * @param bool $skipCache
+     * @param int $cacheMinutes
      * @return array
-     * @throws TraitNotUsedException
      */
     protected function eagerLoadRelation(array $models, $name, \Closure $constraints, $skipCache = false, $cacheMinutes = 0)
     {
         $relation = $this->getRelation($name);
 
-//        if(config('perfectly-cache.debug', false) && ! ($relation->getQuery()) instanceof EloquentBuilder) {
-//            //Trait not used exception
-//            throw (new TraitNotUsedException($relation->getQuery()));
-//        }
-
         if($relation->getQuery() instanceof EloquentBuilder) {
+
             $relation->getQuery()->skipCache($skipCache);
+
             if($cacheMinutes) {
-                $relation->getQuery()->remember($cacheMinutes);
+                $relation->getQuery()->getQuery()->remember($cacheMinutes);
             }
         }
 
