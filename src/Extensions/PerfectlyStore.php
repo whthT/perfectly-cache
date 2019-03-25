@@ -137,6 +137,13 @@ class PerfectlyStore implements PerfectlyStoreInterface
     }
 
     /**
+     * @return Filesystem
+     */
+    public function getFilesystem() {
+        return $this->filesystem;
+    }
+
+    /**
      *@return boolean
      */
     public function forgetAll() {

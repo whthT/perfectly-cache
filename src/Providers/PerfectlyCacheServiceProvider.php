@@ -9,6 +9,7 @@
 namespace Whtht\PerfectlyCache\Providers;
 
 use Whtht\PerfectlyCache\Commands\PerfectlyCacheClearCommand;
+use Whtht\PerfectlyCache\Commands\PerfectlyCacheListCommand;
 use Whtht\PerfectlyCache\Extensions\PerfectlyStore;
 use Whtht\PerfectlyCache\PerfectlyCache;
 
@@ -91,7 +92,8 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
     protected function registerCommands() {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                PerfectlyCacheClearCommand::class
+                PerfectlyCacheClearCommand::class,
+                PerfectlyCacheListCommand::class
             ]);
         }
     }

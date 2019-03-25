@@ -46,7 +46,7 @@ class PerfectlyCache
     public static function generateCacheKey(QueryBuilder $instance) {
         $bindedSql = self::mergeBindings($instance->toSql(), $instance->getBindings());
 
-        return $instance->from."_".md5($bindedSql);
+        return $instance->from."_".md5($bindedSql).".".$instance->cacheMinutes;
     }
 
     /**

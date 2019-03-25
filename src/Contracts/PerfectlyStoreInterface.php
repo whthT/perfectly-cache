@@ -62,4 +62,9 @@ interface PerfectlyStoreInterface extends Store
      * @return boolean
      */
     public function forgetAll();
+
+    /**
+     * @return mixed
+     */
+    public function getFilesystem();
 }
