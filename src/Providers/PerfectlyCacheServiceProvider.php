@@ -76,9 +76,15 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
             'driver' => $this->cacheStore
         ]);
 
+        $cacheDiskPath = storage_path('framework/cache/'.$this->cacheStore);
+
+        if (config('app.env') == "testing") {
+            $cacheDiskPath = __DIR__.'/../../tests/cache-storage';
+        }
+
         config()->set('filesystems.disks.'.$this->cacheStore, [
             'driver' => 'local',
-            'root' => storage_path('framework/cache/'.$this->cacheStore),
+            'root' => $cacheDiskPath,
         ]);
 
     }
