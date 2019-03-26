@@ -130,7 +130,7 @@ class Module extends BaseModel
 {
     protected $table = "modules";
 
-    public $cacheMinutes = 20; // Now cache time 20 minutes.
+    protected $cacheMinutes = 20; // Now cache time 20 minutes.
 }
 ```
 
