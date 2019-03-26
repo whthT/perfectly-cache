@@ -1,15 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Musa
- * Date: 26.03.2019
- * Time: 14:29
- */
 
 namespace Whtht\PerfectlyCache\Tests\Models;
 
 
-class UserWithCache
-{
+use Whtht\PerfectlyCache\Traits\PerfectlyCachable;
+use Illuminate\Database\Eloquent\Model;
 
+class UserWithCache extends Model
+{
+    use PerfectlyCachable;
+
+    protected $table = "users";
+
+    protected $fillable = ["name", "email", "password"];
+
+    public function posts() {
+        return $this->hasMany(Post::class, 'user_id', 'id');
+    }
+
+    public function cached_posts() {
+        return $this->hasMany(PostWithCache::class, 'user_id', 'id');
+    }
 }

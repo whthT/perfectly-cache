@@ -9,7 +9,12 @@
 namespace Whtht\PerfectlyCache\Tests\Models;
 
 
-class PostWithCache
-{
+use Whtht\PerfectlyCache\Traits\PerfectlyCachable;
+use Illuminate\Database\Eloquent\Model;
 
+class PostWithCache extends Model
+{
+    use PerfectlyCachable;
+
+    protected $table = "posts";
 }

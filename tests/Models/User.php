@@ -1,11 +1,12 @@
 <?php
 
-namespace Whtht\PerfectlyCache\Tests\Mock;
+namespace Whtht\PerfectlyCache\Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-    protected $connection = "sqlite";
     protected $table = "users";
+
+    protected $fillable = ["name", "email", "password"];
 }

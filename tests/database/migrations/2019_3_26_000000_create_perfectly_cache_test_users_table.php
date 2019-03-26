@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
+use Illuminate\Support\Facades\DB;
+
 class CreatePerfectlyCacheTestUsersTable extends Migration
 {
     /**
@@ -13,7 +15,7 @@ class CreatePerfectlyCacheTestUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('perfectly_cache_test_users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('email')->unique();
@@ -24,7 +26,7 @@ class CreatePerfectlyCacheTestUsersTable extends Migration
         });
 
         $now = now();
-        \Illuminate\Support\Facades\DB::table('perfectly_cache_test_users')->insert([
+        DB::table('users')->insert([
             'name' => 'Musa Kurt',
             'email' => 'hackedtim61@gmail.com',
             'password' => \Illuminate\Support\Facades\Hash::make('123'),
@@ -40,6 +42,6 @@ class CreatePerfectlyCacheTestUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('perfectly_cache_test_users');
+        Schema::dropIfExists('users');
     }
 }
