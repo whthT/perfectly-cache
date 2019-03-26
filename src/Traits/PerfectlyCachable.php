@@ -9,8 +9,7 @@ use Whtht\PerfectlyCache\PerfectlyCache;
 
 trait PerfectlyCachable
 {
-    protected $isCacheEnable = true;
-    protected $cacheMinutes = 0;
+    use CacheGettersSetters;
 
     protected function newBaseQueryBuilder()
     {
