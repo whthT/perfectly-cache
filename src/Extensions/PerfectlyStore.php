@@ -18,7 +18,7 @@ use Illuminate\Support\InteractsWithTime;
 class PerfectlyStore implements PerfectlyStoreInterface
 {
     use InteractsWithTime;
-    protected $store, $filesystem, $cacheFileExt = 'pc';
+    protected $store, $filesystem;
 
     public function __construct()
     {
@@ -131,7 +131,7 @@ class PerfectlyStore implements PerfectlyStoreInterface
      */
     public function getCacheFile(string $key)
     {
-        return $this->getDirectory()->path($this->combineCacheName($key));
+        return $this->getDirectory()->path($key);
     }
 
     /**
@@ -139,21 +139,6 @@ class PerfectlyStore implements PerfectlyStoreInterface
      */
     public function getDirectory() {
         return Storage::disk($this->store);
-    }
-
-    /**
-     * @param string $key
-     * @return string
-     */
-    public function combineCacheName(string $key) {
-        return $key.".".$this->getCacheFileExt();
-    }
-
-    /**
-     * @return string
-     */
-    public function getCacheFileExt() {
-        return $this->cacheFileExt;
     }
 
 
@@ -209,11 +194,26 @@ class PerfectlyStore implements PerfectlyStoreInterface
      * @param string $table
      * @return bool
      */
-    public function forget($table)
+    public function forget($key)
     {
-        $files = $this->filesystem->glob($this->getDirectory()->path('').$table."_*.".$this->getCacheFileExt());
+        return $this->filesystem->delete($this->getDirectory()->path($key));
+    }
 
-        return $this->filesystem->delete($files);
+    /**
+     * @param mixed ...$table
+     * @return bool
+     */
+    public function forgetByTable(...$table) {
+        $table = collect($table)->flatten();
+        $pass = 0;
+        foreach ($table as $item) {
+            $keys = $this->filesystem->glob($this->getDirectory()->path($item).'_-_*');
+            if ($this->filesystem->delete($keys)) {
+                $pass += count($keys);
+            }
+        }
+
+        return $pass;
     }
 
     /**
@@ -229,11 +229,11 @@ class PerfectlyStore implements PerfectlyStoreInterface
      */
     public function flush()
     {
-        $pass = true;
+        $pass = 0;
 
         foreach ($this->filesystem->allFiles($this->getDirectory()->path('')) as $file) {
-            if (! $this->filesystem->delete($file)) {
-                $pass = false;
+            if ($this->filesystem->delete($file)) {
+                $pass++;
             }
         }
 

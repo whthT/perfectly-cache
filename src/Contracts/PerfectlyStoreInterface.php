@@ -26,17 +26,6 @@ interface PerfectlyStoreInterface extends Store
 
     /**
      * @param string $key
-     * @return string
-     */
-    public function combineCacheName(string $key);
-
-    /**
-     * @return string
-     */
-    public function getCacheFileExt();
-
-    /**
-     * @param string $key
      * @return boolean
      */
     public function exists(string $key);
@@ -62,4 +51,10 @@ interface PerfectlyStoreInterface extends Store
      * @return mixed
      */
     public function getFilesystem();
+
+    /**
+     * @param $table
+     * @return bool
+     */
+    public function forgetByTable(...$table);
 }
