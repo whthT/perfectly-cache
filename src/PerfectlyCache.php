@@ -10,6 +10,7 @@ namespace Whtht\PerfectlyCache;
 
 
 use Whtht\PerfectlyCache\Builders\QueryBuilder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -40,13 +41,16 @@ class PerfectlyCache
     }
 
     /**
-     * @param string $sql
+     * @param QueryBuilder|Model $instance
      * @return string
      */
-    public static function generateCacheKey(QueryBuilder $instance) {
-        $bindedSql = self::mergeBindings($instance->toSql(), $instance->getBindings());
+    public static function generateCacheKey(string $table, string $sql, array $bindings = [], int $minutes = 0) {
 
-        return $instance->from."_-_".md5($bindedSql)."_-_".$instance->cacheMinutes;
+        $bindedSql = self::mergeBindings($sql, $bindings);
+
+        $sql = md5($bindedSql);
+
+        return "{$table}_-_{$sql}_-_{$minutes}";
     }
 
     /**
@@ -76,6 +80,7 @@ class PerfectlyCache
      * @return string
      */
     public static function compressOutput(Collection $data) :string {
+
         $data = $data->toJson();
         if (self::gzenabled()) {
             $data = gzencode($data);
@@ -101,16 +106,16 @@ class PerfectlyCache
      * @param string $table
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public static function clearCacheByTable(string $table) {
+    public static function clearCacheByTable(array $table) {
         $store = config('perfectly-cache.cache-store', 'perfectly-cache');
 
-        Cache::store($store)->deleteMultiple([$table]);
+        return Cache::store($store)->forgetByTable($table);
     }
 
     public static function clearAllCaches() {
         $store = config('perfectly-cache.cache-store', 'perfectly-cache');
 
-        Cache::store($store)->flush();
+        return Cache::store($store)->flush();
     }
 
 }
