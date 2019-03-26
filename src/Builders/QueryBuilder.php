@@ -10,7 +10,10 @@ namespace Whtht\PerfectlyCache\Builders;
 
 
 use Whtht\PerfectlyCache\PerfectlyCache;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Facades\Cache;
 
 class QueryBuilder extends Builder
@@ -32,6 +35,23 @@ class QueryBuilder extends Builder
     }
 
     /**
+     * @return string
+     */
+    public function getTable() {
+        return $this->from;
+    }
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getCacheMinutes() {
+        $minutes = $this->cacheMinutes;
+        $minutes = $minutes ? $minutes : config('perfectly-cache.minutes', PerfectlyCache::$defaultCacheMinutes);
+
+        return $minutes;
+    }
+
+    /**
      * The progress for cache remember.
      * Last action of PerfectlyCache
      * @param array $columns
@@ -44,7 +64,7 @@ class QueryBuilder extends Builder
 
         if ($cacheEnabled && $this->isCacheEnable && ! $this->cacheSkip) {
 
-            $this->cacheKey = PerfectlyCache::generateCacheKey($this);
+            $this->cacheKey = PerfectlyCache::generateCacheKey($this->getTable(), $this->toSql(), $this->getBindings(), $this->getCacheMinutes());
 
             $calculatedCacheMinutes = PerfectlyCache::calcultateCacheMinutes($this->cacheMinutes);
 
@@ -73,6 +93,7 @@ class QueryBuilder extends Builder
      */
     public function remember(int $minutes) :self {
         $this->cacheMinutes = $minutes;
+
         return $this;
     }
 }
