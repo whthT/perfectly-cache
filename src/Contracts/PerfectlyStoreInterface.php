@@ -59,11 +59,6 @@ interface PerfectlyStoreInterface extends Store
     public function existsInConfig(string $key);
 
     /**
-     * @return boolean
-     */
-    public function forgetAll();
-
-    /**
      * @return mixed
      */
     public function getFilesystem();

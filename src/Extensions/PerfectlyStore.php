@@ -12,12 +12,14 @@ namespace Whtht\PerfectlyCache\Extensions;
 use Whtht\PerfectlyCache\Contracts\PerfectlyStoreInterface;
 use Whtht\PerfectlyCache\PerfectlyCache;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\InteractsWithTime;
 
 class PerfectlyStore implements PerfectlyStoreInterface
 {
+    use InteractsWithTime;
     protected $store, $filesystem, $cacheFileExt = 'pc';
+
     public function __construct()
     {
         $this->filesystem = new Filesystem();
@@ -36,29 +38,77 @@ class PerfectlyStore implements PerfectlyStoreInterface
         // TODO: Implement many() method.
     }
 
-    public function get($key)
+    /**
+     * @return array
+     */
+    protected function emptyPayload()
     {
-        if ($this->exists($key)) {
-            if ($this->existsInConfig($key)) {
-
-                return $this->getFromConfig($key);
-
-            }
-
-            $result = PerfectlyCache::uncompressOutput($this->filesystem->get($this->getCacheFile($key)));
-
-            config()->set('perfectly-cache.caching.'.$key, $result);
-
-            return $result;
-        }
-
-        return null;
+        return ['data' => null, 'time' => null];
     }
 
+    /**
+     * @return int
+     */
+    protected function currentTime()
+    {
+        return now()->getTimestamp();
+    }
+
+    /**
+     * @param array|string $key
+     * @return \Illuminate\Config\Repository|mixed|null
+     */
+    public function get($key)
+    {
+        if ($this->existsInConfig($key)) {
+            return $this->getFromConfig($key);
+        }
+
+        return $this->getPayload($key)['data'] ?? null;
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    protected function getPayload(string $key) {
+        try {
+
+            $expire = substr($result = $this->filesystem->get($this->getCacheFile($key)), 0, 10);
+
+        }catch (\Exception $exception) {
+            return $this->emptyPayload();
+        }
+
+        if ($this->currentTime() >= $expire) {
+            $this->forget($key);
+
+            return $this->emptyPayload();
+        }
+
+
+        $result = PerfectlyCache::uncompressOutput(substr($result, 10, strlen($result)));
+
+        config()->set('perfectly-cache.caching.'.$key, $result);
+
+        return [
+            'data' => $result,
+            'time' => $expire - $this->currentTime()
+        ];
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
     public function existsInConfig(string $key) {
         return config('perfectly-cache.caching.'.$key) ? true : false;
     }
 
+    /**
+     * @param string $key
+     * @return \Illuminate\Config\Repository|mixed
+     */
     public function getFromConfig(string $key) {
         return config('perfectly-cache.caching.'.$key);
     }
@@ -75,15 +125,26 @@ class PerfectlyStore implements PerfectlyStoreInterface
         return $this->filesystem->exists($this->getCacheFile($key));
     }
 
+    /**
+     * @param string $key
+     * @return string
+     */
     public function getCacheFile(string $key)
     {
         return $this->getDirectory()->path($this->combineCacheName($key));
     }
 
+    /**
+     * @return \Illuminate\Contracts\Filesystem\Filesystem|string
+     */
     public function getDirectory() {
         return Storage::disk($this->store);
     }
 
+    /**
+     * @param string $key
+     * @return string
+     */
     public function combineCacheName(string $key) {
         return $key.".".$this->getCacheFileExt();
     }
@@ -96,15 +157,32 @@ class PerfectlyStore implements PerfectlyStoreInterface
     }
 
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @param int $seconds
+     * @return bool
+     */
     public function put($key, $value, $seconds)
     {
         config()->set('perfectly-cache.caching.'.$key, $value);
 
-        $value = PerfectlyCache::compressOutput($value);
+        $value = $this->expiration($seconds).PerfectlyCache::compressOutput($value);
 
-        $result = $this->filesystem->put($this->getCacheFile($key), $value, false);
+        $result = $this->filesystem->put($this->getCacheFile($key), $value, true);
 
         return $result !== false && $result > 0;
+    }
+
+    /**
+     * @param $seconds
+     * @return int
+     */
+    protected function expiration($seconds)
+    {
+        $time = $this->availableAt($seconds);
+
+        return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
     }
 
     public function putMany(array $values, $seconds)
@@ -127,13 +205,15 @@ class PerfectlyStore implements PerfectlyStoreInterface
         // TODO: Implement forever() method.
     }
 
+    /**
+     * @param string $table
+     * @return bool
+     */
     public function forget($table)
     {
         $files = $this->filesystem->glob($this->getDirectory()->path('').$table."_*.".$this->getCacheFileExt());
 
-        $this->filesystem->delete($files);
-
-        return true;
+        return $this->filesystem->delete($files);
     }
 
     /**
@@ -143,10 +223,12 @@ class PerfectlyStore implements PerfectlyStoreInterface
         return $this->filesystem;
     }
 
+
     /**
-     *@return boolean
+     * @return bool
      */
-    public function forgetAll() {
+    public function flush()
+    {
         $pass = true;
 
         foreach ($this->filesystem->allFiles($this->getDirectory()->path('')) as $file) {
@@ -156,11 +238,6 @@ class PerfectlyStore implements PerfectlyStoreInterface
         }
 
         return $pass;
-    }
-
-    public function flush()
-    {
-        // TODO: Implement flush() method.
     }
 
     public function getPrefix()

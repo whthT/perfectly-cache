@@ -46,7 +46,7 @@ class PerfectlyCache
     public static function generateCacheKey(QueryBuilder $instance) {
         $bindedSql = self::mergeBindings($instance->toSql(), $instance->getBindings());
 
-        return $instance->from."_".md5($bindedSql).".".$instance->cacheMinutes;
+        return $instance->from."_-_".md5($bindedSql)."_-_".$instance->cacheMinutes;
     }
 
     /**
@@ -110,7 +110,7 @@ class PerfectlyCache
     public static function clearAllCaches() {
         $store = config('perfectly-cache.cache-store', 'perfectly-cache');
 
-        Cache::store($store)->forgetAll();
+        Cache::store($store)->flush();
     }
 
 }

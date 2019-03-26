@@ -70,21 +70,15 @@ class PerfectlyCacheListCommand extends Command
 
             $name = $file->getFilename();
 
-            $split = explode('_', $name);
+            $split = explode('_-_', $name);
 
-            if (isset($split[0]) && isset($split[1])) {
 
-                if (!array_key_exists($split[0], $list)) {
+            if (isset($split[0]) && isset($split[1]) && isset($split[2])) {
+
+                if (! array_key_exists($split[0], $list)) {
                     $list[$split[0]] = [];
                 }
 
-
-                $deadTime = explode('.', $split[1]);
-                if (count($deadTime) && isset($deadTime[1])) {
-                    $deadTime = $deadTime[1];
-                } else {
-                    $deadTime = 30;
-                }
 
                 $createdDate = Carbon::parse($file->getCTime());
 
@@ -92,7 +86,7 @@ class PerfectlyCacheListCommand extends Command
                     $split[0],
                     $createdDate->toDateTimeString(),
                     $createdDate->diffForHumans(),
-                    $createdDate->addMinutes($deadTime)->toDateTimeString(),
+                    $createdDate->addMinutes($split[2])->toDateTimeString(),
                     $createdDate->diffForHumans(),
                     $this->formatBytes($file->getSize())
                 ];
