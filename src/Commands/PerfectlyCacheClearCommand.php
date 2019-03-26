@@ -19,7 +19,7 @@ class PerfectlyCacheClearCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'perfectly-cache:clear {table?}';
+    protected $signature = 'perfectly-cache:clear {table?*}';
 
     /**
      * The console command description.
@@ -46,16 +46,18 @@ class PerfectlyCacheClearCommand extends Command
      */
     public function handle()
     {
+        $total = 0;
         if ($table = $this->argument('table')) {
-            $this->info("[PerfectlyCache] Clear progress: $table");
+            $this->info("[PerfectlyCache] Clear progress: ".implode(', ', $table));
 
-            PerfectlyCache::clearCacheByTable($table);
+            $total = PerfectlyCache::clearCacheByTable($table);
 
         } else {
             $this->info("[PerfectlyCache] Clearing all caches..");
-            PerfectlyCache::clearAllCaches();
+            $total = PerfectlyCache::clearAllCaches();
         }
 
         $this->info("[PerfectlyCache] Cache clearing completed. [OK]");
+        $this->info("[PerfectlyCache] Successfully cleared $total cache in total");
     }
 }
