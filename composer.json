@@ -9,7 +9,6 @@
     "minimum-stability": "dev",
     "require": {},
     "require-dev": {
-        "phpunit/phpunit": "^7",
         "orchestra/testbench": "^3.5"
     },
     "autoload": {
@@ -28,5 +27,8 @@
         "psr-4": {
             "Whtht\\PerfectlyCache\\Tests\\": "./tests/"
         }
+    },
+    "scripts": {
+    	"test": "phpunit"
     }
 }
