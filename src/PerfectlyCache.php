@@ -103,10 +103,10 @@ class PerfectlyCache
     }
 
     /**
-     * @param string $table
+     * @param array|string $table
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public static function clearCacheByTable(array $table) {
+    public static function clearCacheByTable($table) {
         $store = config('perfectly-cache.cache-store', 'perfectly-cache');
 
         return Cache::store($store)->forgetByTable($table);
