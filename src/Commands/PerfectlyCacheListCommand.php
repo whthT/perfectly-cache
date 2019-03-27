@@ -65,7 +65,9 @@ class PerfectlyCacheListCommand extends Command
         $files = $filesystem->allFiles(Cache::store($store)->getDirectory()->path(''));
 
         $list = [];
-
+        $tableCount = 0;
+        $totalSize = 0;
+        $count = 0;
         foreach ($files as $file) {
 
             $name = $file->getFilename();
@@ -76,6 +78,7 @@ class PerfectlyCacheListCommand extends Command
             if (isset($split[0]) && isset($split[1]) && isset($split[2])) {
 
                 if (! array_key_exists($split[0], $list)) {
+                    $tableCount++;
                     $list[$split[0]] = [];
                 }
 
@@ -91,11 +94,23 @@ class PerfectlyCacheListCommand extends Command
                     $deadTime->diffForHumans(),
                     $this->formatBytes($file->getSize())
                 ];
+
+                $count++;
+
+                $totalSize += $file->getSize();
             }
         }
+
+        $list[] = ['', '', '', '', '', ''];
+        $list[] = ['Total Size', '', '', '', '', $this->formatBytes($totalSize)];
+
+
+        echo "\n";
+        $this->info("[PerfectlyCache] There are currently a total of $count cache(s).");
         $this->table([
-            'Table', 'Created At', 'Created At For Humans', 'Dead At', 'Dead At For Humans', 'Size'
+            "Table ($tableCount)", 'Created At', 'Created At For Humans', 'Dead At', 'Dead At For Humans', 'Size'
         ], $list);
+
 
     }
 }
