@@ -79,15 +79,16 @@ class PerfectlyCacheListCommand extends Command
                     $list[$split[0]] = [];
                 }
 
+                $createdDate = Carbon::parse(date('Y-m-d H:i:s', $file->getCTime()));
+                $deadTime = Carbon::parse(date('Y-m-d H:i:s', $file->getCTime()))->addMinutes($split[2]);
 
-                $createdDate = Carbon::parse($file->getCTime());
 
                 $list[] = [
                     $split[0],
                     $createdDate->toDateTimeString(),
                     $createdDate->diffForHumans(),
-                    $createdDate->addMinutes($split[2])->toDateTimeString(),
-                    $createdDate->diffForHumans(),
+                    $deadTime->toDateTimeString(),
+                    $deadTime->diffForHumans(),
                     $this->formatBytes($file->getSize())
                 ];
             }
