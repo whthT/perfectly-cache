@@ -183,6 +183,10 @@ php artisan perfectly-cache:clear
 #Clear all users table caches
 php artisan perfectly-cache:clear users
 
+#Clear all users and modules tables caches
+php artisan perfectly-cache:clear users modules
+# Infinity table names
+
 #Show cache details
 php artisan perfectly-cache:list
 ```
