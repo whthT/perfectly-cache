@@ -5,6 +5,7 @@ namespace Whtht\PerfectlyCache\Traits;
 
 use Whtht\PerfectlyCache\Builders\EloquentBuilder;
 use Whtht\PerfectlyCache\Builders\QueryBuilder;
+use Whtht\PerfectlyCache\Events\ModelEvents;
 use Whtht\PerfectlyCache\PerfectlyCache;
 
 trait PerfectlyCachable

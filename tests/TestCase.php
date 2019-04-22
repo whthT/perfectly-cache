@@ -34,7 +34,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $this->artisan('migrate', ['--database' => 'testing']);
 
-        $this->cacheStore = config('perfectly-cache.cache-store', 'perfectly-cache');
+        $this->cacheStore = config('perfectly-cache.store', 'perfectly-cache');
 
         $this->storage = Storage::disk($this->cacheStore);
     }

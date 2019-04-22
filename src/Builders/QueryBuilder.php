@@ -14,7 +14,9 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class QueryBuilder extends Builder
 {
@@ -60,17 +62,17 @@ class QueryBuilder extends Builder
     public function rememberProgress($columns = ["*"]) {
 
         $cacheEnabled = config('perfectly-cache.enabled', true);
-        $cacheStore = config('perfectly-cache.cache-store', 'perfectly-cache');
+        $cacheStore = config('perfectly-cache.store', 'perfectly-cache');
 
         if ($cacheEnabled && $this->isCacheEnable && ! $this->cacheSkip) {
 
             $this->cacheKey = PerfectlyCache::generateCacheKey($this->getTable(), $this->toSql(), $this->getBindings(), $this->getCacheMinutes());
 
             $calculatedCacheMinutes = PerfectlyCache::calcultateCacheMinutes($this->cacheMinutes);
-
-            return Cache::store($cacheStore)->remember(
-                $this->cacheKey, $calculatedCacheMinutes, function () use($columns) {
-
+            $cacheKey = $this->cacheKey;
+            return Cache::store($cacheStore)->remember($this->cacheKey, $calculatedCacheMinutes, function () use($columns, $cacheKey) {
+                $filesystem = new Filesystem();
+                $filesystem->put(Storage::disk('perfectly-cache')->path('') . "$cacheKey", "");
                 return parent::get($columns);
             });
         }

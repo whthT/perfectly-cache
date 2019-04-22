@@ -10,7 +10,9 @@ namespace Whtht\PerfectlyCache\Providers;
 
 use Whtht\PerfectlyCache\Commands\PerfectlyCacheClearCommand;
 use Whtht\PerfectlyCache\Commands\PerfectlyCacheListCommand;
+use Whtht\PerfectlyCache\Events\ModelEvents;
 use Whtht\PerfectlyCache\Extensions\PerfectlyStore;
+use Whtht\PerfectlyCache\Listeners\ModelDispactEventListener;
 use Whtht\PerfectlyCache\PerfectlyCache;
 
 use Illuminate\Support\Facades\Cache;
@@ -62,6 +64,9 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
         ]);
     }
 
+    protected function isPerfectlyStoreSelected() {
+        return config('perfectly-cache.store') === 'perfectly-cache';
+    }
     /**
      * Register Perfectly Cache Configs
      */
@@ -69,30 +74,36 @@ class PerfectlyCacheServiceProvider extends ServiceProvider
         /**
          * Register cachind array for minimize duplicate cache hits
          */
+        if ($this->isPerfectlyStoreSelected() || $this->isTesting()) {
+            config()->set('perfectly-cache.caching', []);
 
-        config()->set('perfectly-cache.caching', []);
-
-        config()->set('cache.stores.'.$this->cacheStore, [
-            'driver' => $this->cacheStore
-        ]);
+            config()->set('cache.stores.'.$this->cacheStore, [
+                'driver' => $this->cacheStore
+            ]);
+        }
 
         $cacheDiskPath = storage_path('framework/cache/'.$this->cacheStore);
 
-        if (config('app.env') == "testing") {
+        if ($this->isTesting()) {
             $cacheDiskPath = __DIR__.'/../../tests/cache-storage';
         }
 
-        config()->set('filesystems.disks.'.$this->cacheStore, [
+        config()->set('filesystems.disks.perfectly-cache', [
             'driver' => 'local',
             'root' => $cacheDiskPath,
         ]);
+    }
 
+    protected function isTesting() {
+        return config('app.env') == "testing";
     }
 
     protected function registerCacheStore() {
-        Cache::extend($this->cacheStore, function() {
-            return Cache::repository(new PerfectlyStore);
-        });
+        if ($this->isPerfectlyStoreSelected() || $this->isTesting()) {
+            Cache::extend($this->cacheStore, function() {
+                return Cache::repository(new PerfectlyStore);
+            });
+        }
     }
 
     protected function registerCommands() {

@@ -23,7 +23,7 @@ class PerfectlyStore implements PerfectlyStoreInterface
     public function __construct()
     {
         $this->filesystem = new Filesystem();
-        $this->store = config('perfectly-cache.cache-directory', 'perfectly-cache');
+        $this->store = 'perfectly-cache';
     }
 
     /**

@@ -22,14 +22,6 @@ return [
         "deleted"
     ],
 
-    /**
-     * If debug mode is off, it does not show any error.
-     */
-    "debug" => true,
-
-    /**
-     * Cache store directory, store name, config name, etc. names
-     */
-    'cache-store' => 'perfectly-cache',
+    'store' => 'perfectly-cache', // perfectly-cache is default cache store, Usable: database, file, array, etc.
 
 ];

@@ -11,8 +11,10 @@ namespace Whtht\PerfectlyCache;
 
 use Whtht\PerfectlyCache\Builders\QueryBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PerfectlyCache
 {
@@ -107,15 +109,37 @@ class PerfectlyCache
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public static function clearCacheByTable($table) {
-        $store = config('perfectly-cache.cache-store', 'perfectly-cache');
-
-        return Cache::store($store)->forgetByTable($table);
+        $store = config('perfectly-cache.store', 'perfectly-cache');
+        if ($store === 'perfectly-cache') {
+            return Cache::store($store)->forgetByTable($table);
+        } else {
+            self::differentCacheStoreForgetByTable($table);
+        }
     }
 
     public static function clearAllCaches() {
-        $store = config('perfectly-cache.cache-store', 'perfectly-cache');
+        $store = config('perfectly-cache.store', 'perfectly-cache');
 
         return Cache::store($store)->flush();
+    }
+
+    public static function differentCacheStoreForgetByTable(...$table) {
+        $store = config('perfectly-cache.store', 'perfectly-cache');
+        $table = collect($table)->flatten();
+        $pass = 0;
+        $filesystem = new Filesystem();
+        foreach ($table as $item) {
+            $keys = $filesystem->glob(Storage::disk('perfectly-cache')->path($item).'_-_*');
+            foreach ($keys as $key) {
+                $key = explode('\\', $key);
+                Cache::store($store)->forget(last($key));
+            }
+            if ($filesystem->delete($keys)) {
+                $pass += count($keys);
+            }
+        }
+
+        return $pass;
     }
 
 }
