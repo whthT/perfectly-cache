@@ -199,15 +199,6 @@ php artisan perfectly-cache:clear users modules
 php artisan perfectly-cache:list
 ```
 
-## Debug Mode
-If you enable debug mode from the ``perfectly-cache`` settings, you will make PerfectlyCache Exception visible.
-```
-/**
- * If debug mode is off, it does not show any error.
- */
-"debug" => true
-```
-
 ## Notice
 
 If you already used time on your queries and this query will be cached, like this,
