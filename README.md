@@ -10,18 +10,21 @@ PerfectlyCache automatically redirects the same query to the model when you need
 
 - Composer
 Execute the following command to get the latest version of the package:
-```bash
+
+```
 composer require whtht/perfectly-cache
 ```
 
 - Publish Configuration
-```bash
+
+```
 php artisan vendor:publish --provider="Whtht\PerfectlyCache\Providers\PerfectlyCacheServiceProvider"
 ```
 
 - Use trait on your models   
     add this code in your models / or add just your base model like this   
-```php
+```
+
 <?php
 namespace App;
 
@@ -39,7 +42,8 @@ class User extends Model
 All database queries you make through this model will be cached and will be read from the cache instead of the database when needed.
 
 ## Configuration
-```php
+```
+
 // config('perfectly-cache.(name)')
 // Eq: config('perfecyly-cache.enabled')
 return [
@@ -77,12 +81,14 @@ return [
 
 ## Cache Skipping
 - With Chain  
-```php
+```
+
     // ->skipCache();
     $result = Category::select("id", "name")->skipCache()->get();
 ```
 - With Eager Load   
-```php    
+```
+
     /**
     * Thanks to the ^ sign, you can prevent your relationships from being cached.
     */
@@ -97,7 +103,8 @@ return [
 ```
 - Skip in Model
     >Manage your models with ``$isCacheEnable`` variable.
-```php
+```
+
 <?php
 namespace App;
 
@@ -114,13 +121,14 @@ You can specify globally from the model or directly during the query as you can 
 The cache time can be edited in the query, in the model, and in the settings.
 
 - In Config
-```php
+```
 ...
 "minutes" => 30,
 
 ```
 - In Model ``$cacheMinutes``
-```php
+```
+
 <?php
 
 namespace App;
@@ -136,13 +144,13 @@ class Module extends BaseModel
 
 - In Query ``->remember(:minutes)``
 
-```php
+```
 $modules = \App\Module::remember(10)->select("id", "name")->get();
 ```
 This query will be cached for 10 minutes.
 
 - In Eager Load
-```php
+```
 $modules = \App\Module::with([
     "(10)categories:id,name,module_id"
 ])->select("id", "name")->get();
@@ -151,7 +159,7 @@ $modules = \App\Module::with([
 
 ## Usage
 
-```php
+```
 // Basic cache
 $results = \App\Category::find($id);
 
@@ -168,7 +176,7 @@ $results = \App\Category::with("^_list_category_tags")->find($id);
 
 ## Programmatically Cache Reloading
 If you want to refresh the query logically, you can use `` ->reloadCache() `` as follows.
-```php
+```
 $module = Module::select("id", "name", "need_cache_reload")->first();
 if($module->need_cache_reload) { // simple true value
     $module->reloadCache();
@@ -176,7 +184,7 @@ if($module->need_cache_reload) { // simple true value
 ```
 
 ## Commands
-```bash
+```
 # Clear all caches.
 php artisan perfectly-cache:clear
 
@@ -193,7 +201,7 @@ php artisan perfectly-cache:list
 
 ## Debug Mode
 If you enable debug mode from the ``perfectly-cache`` settings, you will make PerfectlyCache Exception visible.
-```php
+```
 /**
  * If debug mode is off, it does not show any error.
  */
@@ -203,7 +211,7 @@ If you enable debug mode from the ``perfectly-cache`` settings, you will make Pe
 ## Notice
 
 If you already used time on your queries and this query will be cached, like this,
-```php
+```
 $modules2 = Module::select("id", "name")
     ->where("created_time_unix", ">=", time())
     ->get();
