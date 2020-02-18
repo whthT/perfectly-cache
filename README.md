@@ -46,7 +46,7 @@ All database queries you make through this model will be cached and will be read
 // Eq: config('perfecyly-cache.enabled')
 return [
 
-    "enabled" => true, // Is cache enabled? For cache for production --> !env('APP_DEBUG', false)
+    "enabled" => true, // Is cache enabled? cache for production --> !env('APP_DEBUG', false)
 
     "minutes" => 1, // Cache minutes.
 
