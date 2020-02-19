@@ -60,7 +60,7 @@ return [
         "deleted"
     ],
 
-    'store' => 'redis', // perfectly-cache is default cache store, Usable: database, file, array, etc.
+    'store' => 'perfectly-cache', // perfectly-cache is default cache store, Usable: database, file, array, etc.
 
 ];
 
