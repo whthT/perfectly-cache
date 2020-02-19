@@ -33,7 +33,7 @@ class CreatePerfectlyCacheTestPostsTable extends Migration{
         for ($i = 0; $i < 20; $i++) {
             DB::table('posts')->insert([
                 'user_id' => $user->id,
-                'name' => str_random(20),
+                'name' => 'Random '.rand(1000, 5000),
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
