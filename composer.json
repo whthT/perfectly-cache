@@ -9,7 +9,7 @@
     "minimum-stability": "dev",
     "require": {},
     "require-dev": {
-        "orchestra/testbench": "^3.5"
+        "orchestra/testbench": "^4.0"
     },
     "autoload": {
         "psr-4": {
