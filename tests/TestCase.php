@@ -17,7 +17,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 {
     public $filesystem, $storage, $cacheStore;
 
-    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    public function __construct($name = null, array $data = [], string $dataName = null)
     {
         $this->filesystem = new Filesystem();
         parent::__construct($name, $data, $dataName);
