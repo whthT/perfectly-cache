@@ -9,12 +9,9 @@
 namespace Whtht\PerfectlyCache;
 
 
-use Whtht\PerfectlyCache\Builders\QueryBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
+use Whtht\PerfectlyCache\Builders\QueryBuilder;
 
 class PerfectlyCache
 {
@@ -69,77 +66,41 @@ class PerfectlyCache
     public static function calcultateCacheMinutes(int $cacheMinutes) :int {
         return self::getCacheMultiplier() * $cacheMinutes;
     }
-
-    /**
-     * @return bool
-     */
-    public static function gzenabled() :bool {
-        return function_exists('gzencode') && function_exists('gzdecode');
-    }
-
-    /**
-     * @param Collection $data
-     * @return string
-     */
-    public static function compressOutput(Collection $data) :string {
-
-        $data = $data->toJson();
-        if (self::gzenabled()) {
-            $data = gzencode($data);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param $data
-     * @return Collection
-     */
-    public static function uncompressOutput($data) {
-
-        if (self::gzenabled() && $data) {
-            $data = gzdecode($data);
-        }
-
-        return collect(json_decode($data, true));
-    }
-
     /**
      * @param array|string $table
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public static function clearCacheByTable($table) {
-        $store = config('perfectly-cache.store', 'perfectly-cache');
-        if ($store === 'perfectly-cache') {
-            return Cache::store($store)->forgetByTable($table);
-        } else {
-            self::differentCacheStoreForgetByTable($table);
+    public static function clearCacheByTable(...$tables) {
+        $tables = collect($tables)->flatten()->toArray();
+        $tag = config('perfectly-cache.tag', 'pc');
+        $keys = Cache::get("perfectly_cache_keys", []);
+
+        $keysToBeForget = array_filter($keys, function ($key) use ($tables) {
+           $explode = explode('_-_', $key);
+           $tableName = $explode[0];
+           return in_array($tableName, $tables);
+        });
+
+        foreach ($keysToBeForget as $key) {
+            Cache::tags($tag)->forget($key);
         }
+
+        $indexes = array_filter(Cache::get("perfectly_cache_keys", []), function ($value) use ($keysToBeForget) {
+            return ! in_array($value, $keysToBeForget);
+        });
+
+        Cache::forever("perfectly_cache_keys", array_values(array_unique($indexes)));
+
+        return count($keysToBeForget);
     }
 
     public static function clearAllCaches() {
-        $store = config('perfectly-cache.store', 'perfectly-cache');
+        $tag = config('perfectly-cache.tag', 'pc');
+        $total = count(Cache::get("perfectly_cache_keys", []));
+        Cache::forget("perfectly_cache_keys");
+        Cache::tags($tag)->flush();
 
-        return Cache::store($store)->flush();
-    }
-
-    public static function differentCacheStoreForgetByTable(...$table) {
-        $store = config('perfectly-cache.store', 'perfectly-cache');
-        $table = collect($table)->flatten();
-        $pass = 0;
-        $filesystem = new Filesystem();
-        foreach ($table as $item) {
-            $keys = $filesystem->glob(Storage::disk('perfectly-cache')->path($item).'_-_*');
-            foreach ($keys as $key) {
-                $key = explode('\\', $key);
-                Cache::store($store)->forget(last($key));
-            }
-            if ($filesystem->delete($keys)) {
-                $pass += count($keys);
-            }
-        }
-
-        return $pass;
+        return $total;
     }
 
 }

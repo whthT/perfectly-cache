@@ -9,8 +9,6 @@
 namespace Whtht\PerfectlyCache\Commands;
 
 
-use Carbon\Carbon;
-use Whtht\PerfectlyCache\PerfectlyCache;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -31,26 +29,6 @@ class PerfectlyCacheListCommand extends Command
     protected $description = 'Shows perfectly cache statistics';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    private function formatBytes($bytes, $precision = 2) {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        return round($bytes, $precision) . ' ' . $units[$pow];
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -58,59 +36,10 @@ class PerfectlyCacheListCommand extends Command
      */
     public function handle()
     {
-        $store = config('perfectly-cache.cache-store', 'perfectly-cache');
+        $keys = Cache::get("perfectly_cache_keys", []);
 
-        $filesystem = Cache::store($store)->getFilesystem();
+        $this->info("[PerfectlyCache] Total key(s) count: " . count($keys));
 
-        $files = $filesystem->allFiles(Cache::store($store)->getDirectory()->path(''));
-
-        $list = [];
-        $tableCount = 0;
-        $totalSize = 0;
-        $count = 0;
-        foreach ($files as $file) {
-
-            $name = $file->getFilename();
-
-            $split = explode('_-_', $name);
-
-
-            if (isset($split[0]) && isset($split[1]) && isset($split[2])) {
-
-                if (! array_key_exists($split[0], $list)) {
-                    $tableCount++;
-                    $list[$split[0]] = [];
-                }
-
-                $createdDate = Carbon::parse(date('Y-m-d H:i:s', $file->getCTime()));
-                $deadTime = Carbon::parse(date('Y-m-d H:i:s', $file->getCTime()))->addMinutes($split[2]);
-
-
-                $list[] = [
-                    $split[0],
-                    $createdDate->toDateTimeString(),
-                    $createdDate->diffForHumans(),
-                    $deadTime->toDateTimeString(),
-                    $deadTime->diffForHumans(),
-                    $this->formatBytes($file->getSize())
-                ];
-
-                $count++;
-
-                $totalSize += $file->getSize();
-            }
-        }
-
-        $list[] = ['', '', '', '', '', ''];
-        $list[] = ['Total Size', '', '', '', '', $this->formatBytes($totalSize)];
-
-
-        echo "\n";
-        $this->info("[PerfectlyCache] There are currently a total of $count cache(s).");
-        $this->table([
-            "Table ($tableCount)", 'Created At', 'Created At For Humans', 'Dead At', 'Dead At For Humans', 'Size'
-        ], $list);
-
-
+        return 0;
     }
 }

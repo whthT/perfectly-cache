@@ -9,8 +9,8 @@
 namespace Whtht\PerfectlyCache\Commands;
 
 
-use Whtht\PerfectlyCache\PerfectlyCache;
 use Illuminate\Console\Command;
+use Whtht\PerfectlyCache\PerfectlyCache;
 
 class PerfectlyCacheClearCommand extends Command
 {
@@ -46,7 +46,6 @@ class PerfectlyCacheClearCommand extends Command
      */
     public function handle()
     {
-        $total = 0;
         if ($table = $this->argument('table')) {
             $this->info("[PerfectlyCache] Clear progress: ".implode(', ', $table));
 

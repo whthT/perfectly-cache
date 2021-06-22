@@ -19,13 +19,8 @@ class CreatePerfectlyCacheTestPostsTable extends Migration{
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
             $table->string('name');
-
-            $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
-
-        $now = now();
 
         $user = DB::table('users')->first();
 
@@ -34,8 +29,6 @@ class CreatePerfectlyCacheTestPostsTable extends Migration{
             DB::table('posts')->insert([
                 'user_id' => $user->id,
                 'name' => 'Random '.rand(1000, 5000),
-                'created_at' => $now,
-                'updated_at' => $now,
             ]);
         }
 

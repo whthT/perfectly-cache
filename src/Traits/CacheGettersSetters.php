@@ -9,29 +9,9 @@
 namespace Whtht\PerfectlyCache\Traits;
 
 
-use Whtht\PerfectlyCache\PerfectlyCache;
-
 trait CacheGettersSetters
 {
     protected $isCacheEnable = true;
-    protected $cacheMinutes = 0;
-
-    /**
-     * @return int
-     */
-    public function getCacheMinutes() {
-        return $this->cacheMinutes;
-    }
-
-    /**
-     * @param int $minutes
-     * @return $this
-     */
-    public function setCacheMinutes(int $minutes) {
-        $this->cacheMinutes = $minutes;
-        return $this;
-    }
-
     /**
      * @return bool
      */

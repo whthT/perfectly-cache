@@ -15,7 +15,6 @@ class EloquentBuilder extends Builder
 {
     public function eagerLoadRelations(array $models)
     {
-
         foreach ($this->eagerLoad as $name => $constraints) {
 
             $skipCache = false;
@@ -55,9 +54,9 @@ class EloquentBuilder extends Builder
 
         if($relation->getQuery() instanceof EloquentBuilder) {
 
-            $relation->getQuery()->skipCache($skipCache);
-
-            if($cacheMinutes) {
+            if ($skipCache) {
+                $relation->getQuery()->skipCache($skipCache);
+            } else if ($cacheMinutes) {
                 $relation->getQuery()->getQuery()->remember($cacheMinutes);
             }
         }

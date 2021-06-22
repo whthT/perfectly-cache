@@ -15,14 +15,10 @@ use Illuminate\Support\Facades\Storage;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
-    public $filesystem, $storage, $cacheStore;
-
     public function __construct($name = null, array $data = [], string $dataName = null)
     {
-        $this->filesystem = new Filesystem();
         parent::__construct($name, $data, $dataName);
     }
-
 
     protected function setUp(): void
     {
@@ -33,10 +29,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         $this->artisan('migrate', ['--database' => 'testing']);
-
-        $this->cacheStore = config('perfectly-cache.store', 'perfectly-cache');
-
-        $this->storage = Storage::disk($this->cacheStore);
     }
 
     public function clearCacheList() {
@@ -62,10 +54,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return [
             'PerfectlyCache' => 'Whtht\PerfectlyCache\Facades\PerfectlyCache'
         ];
-    }
-
-    public function getCacheFileList() {
-        return $this->filesystem->allFiles($this->storage->path(''));
     }
 
 }

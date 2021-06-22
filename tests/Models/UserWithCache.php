@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 class UserWithCache extends Model
 {
     use PerfectlyCachable;
-
+    public $timestamps = false;
     protected $table = "users";
 
-    protected $fillable = ["name", "email", "password"];
+    protected $fillable = ["name"];
 
     public function posts() {
         return $this->hasMany(Post::class, 'user_id', 'id');
