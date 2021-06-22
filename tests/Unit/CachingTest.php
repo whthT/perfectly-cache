@@ -12,93 +12,159 @@ use Illuminate\Support\Facades\Cache;
 
 class CachingTest extends TestCase
 {
-    public function testCaching() {
 
-        $this->getUserWithNoCache();
-
-        $this->getUserWithCache();
-
-        $this->getUserWithNoCachedEagerLoad();
-
-        $this->getUserWithCachedEagerLoad();
-
-        $this->fileExistsTest();
-
-        $this->getUserPostsWithLazyLoad();
-    }
-
-    public function getUserWithNoCache() {
-        User::first();
-        $this->assertIfListEmpty();
-    }
-
-    public function getUserWithCache() {
-        UserWithCache::first();
-
-        $this->assertIfSameListLength(1);
-    }
-
-    public function getUserWithNoCachedEagerLoad() {
+    public function test_cache_with_pc_works() {
         UserWithCache::with('posts')->first();
-
-        $this->assertIfSameListLength(1);
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
     }
 
-    public function getUserWithCachedEagerLoad() {
+    public function test_cache_without_pc_works() {
+        User::with('posts')->first();
+        $this->assertCount(0, Cache::get("perfectly_cache_keys", []));
+    }
+
+    public function test_cache_works() {
+        UserWithCache::first();
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+    }
+
+    public function test_skip_cache_in_query_works() {
+        UserWithCache::skipCache()->first();
+        $this->assertCount(0, Cache::get("perfectly_cache_keys", []));
+    }
+
+    public function test_cache_works_with_bindings() {
+        User::with('posts:id,name,user_id')->where('id', '>=', 0)->first();
+        $this->assertCount(0, Cache::get("perfectly_cache_keys", []));
+
+        UserWithCache::with('posts:id,name,user_id')->where('id', '>=', 0)->first();
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+
+        UserWithCache::with('cached_posts:id,name,user_id')->where('id', '>=', 0)->first();
+        $this->assertCount(2, Cache::get("perfectly_cache_keys", []));
+    }
+
+    public function test_skip_cache_in_eagerload_works() {
         UserWithCache::with('cached_posts')->first();
+        $this->assertCount(2, Cache::get("perfectly_cache_keys", []));
 
-        $this->assertIfSameListLength(2);
+        PerfectlyCache::clearAllCaches();
+        $this->assertCount(0, Cache::get("perfectly_cache_keys", []));
+
+        UserWithCache::with('^cached_posts')->first();
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
     }
 
+    public function test_cache_minutes_works_in_eagerload() {
+        UserWithCache::with('(5)cached_posts')->first();
+        $this->assertCount(2, Cache::get("perfectly_cache_keys", []));
 
-    /**
-     * @param int $length
-     */
-    public function assertIfSameListLength(int $length) {
-        $this->assertEquals($length, count($this->getCacheFileList()));
-    }
+        $usersKey = Cache::get("perfectly_cache_keys", [])[0];
+        $postsKey = Cache::get("perfectly_cache_keys", [])[1];
 
-    public function assertIfListEmpty() {
-        /* Cache folder must be empty */
-        $this->assertTrue(
-            blank($this->getCacheFileList())
-        );
-    }
+        $this->assertNotNull(Cache::tags(config('perfectly-cache.tag'))->get($usersKey));
+        $this->assertNotNull(Cache::tags(config('perfectly-cache.tag'))->get($postsKey));
 
-    /**
-     * Key storage tests
-     */
-    public function fileExistsTest() {
-        $table = "posts";
-        $minutes = 15;
+        $this->travel(6)->minutes();
 
-        $post = PostWithCache::select('id', 'name')->where('id', 20)->remember(15);
-
-
-        $key = PerfectlyCache::generateCacheKey($table, $post->toSql(), $post->getBindings(), $minutes);
-
-
-        $cache = Cache::store($this->cacheStore)->get($key);
-
-        $this->assertTrue(is_null($cache));
-
-        $post->get();
-
-        $cache = Cache::store($this->cacheStore)->get($key);
-
-        $this->assertTrue(!is_null($cache));
+        $this->assertNotNull(Cache::tags(config('perfectly-cache.tag'))->get($usersKey));
+        $this->assertNull(Cache::tags(config('perfectly-cache.tag'))->get($postsKey));
 
     }
 
-    public function getUserPostsWithLazyLoad() {
-        $this->assertIfSameListLength(3);
+    public function test_cache_minutes_works() {
+        UserWithCache::first();
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+        $usersKey = Cache::get("perfectly_cache_keys", [])[0];
 
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+
+        $this->travel(29)->minutes();
+
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+
+        $this->travelBack();
+        $this->travel(31)->minutes();
+
+        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+
+    }
+
+    public function test_remember_method_works() {
+        UserWithCache::remember(10)->first();
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+        $usersKey = Cache::get("perfectly_cache_keys", [])[0];
+
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+
+        $this->travel(9)->minutes();
+
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+
+        $this->travelBack();
+        $this->travel(11)->minutes();
+
+        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+    }
+
+    public function test_forget_cache_on_record_created() {
         $user = UserWithCache::first();
+        UserWithCache::select('id')->get();
+        PostWithCache::first();
+        $this->assertCount(3, Cache::get("perfectly_cache_keys", []));
+        $usersKey = Cache::get("perfectly_cache_keys", [])[0];
+        $postsKey = Cache::get("perfectly_cache_keys", [])[2];
 
-        $this->assertIfSameListLength(3);
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
 
-        $posts = $user->cached_posts()->select('id', 'name', 'user_id')->limit(12)->get();
+        UserWithCache::create([
+            "name" => "Test"
+        ]);
 
-        $this->assertIfSameListLength(4);
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+
+        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+    }
+
+    public function test_forget_cache_on_record_updated() {
+        $user = UserWithCache::first();
+        UserWithCache::select('id')->get();
+        PostWithCache::first();
+        $this->assertCount(3, Cache::get("perfectly_cache_keys", []));
+        $usersKey = Cache::get("perfectly_cache_keys", [])[0];
+        $postsKey = Cache::get("perfectly_cache_keys", [])[2];
+
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+
+        $user->update([
+            "name" => "Test 31123"
+        ]);
+
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+
+        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+    }
+
+    public function test_forget_cache_on_record_deleted() {
+        $user = UserWithCache::first();
+        UserWithCache::select('id')->get();
+        PostWithCache::first();
+        $this->assertCount(3, Cache::get("perfectly_cache_keys", []));
+        $usersKey = Cache::get("perfectly_cache_keys", [])[0];
+        $postsKey = Cache::get("perfectly_cache_keys", [])[2];
+
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+
+        $user->delete();
+
+        $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
+
+        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
     }
 }

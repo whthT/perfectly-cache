@@ -9,14 +9,9 @@
 namespace Whtht\PerfectlyCache\Builders;
 
 
-use Whtht\PerfectlyCache\PerfectlyCache;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
+use Whtht\PerfectlyCache\PerfectlyCache;
 
 class QueryBuilder extends Builder
 {
@@ -48,7 +43,7 @@ class QueryBuilder extends Builder
      */
     public function getCacheMinutes() {
         $minutes = $this->cacheMinutes;
-        $minutes = $minutes ? $minutes : config('perfectly-cache.minutes', PerfectlyCache::$defaultCacheMinutes);
+        $minutes = $minutes ?: config('perfectly-cache.minutes', PerfectlyCache::$defaultCacheMinutes);
 
         return $minutes;
     }
@@ -62,17 +57,21 @@ class QueryBuilder extends Builder
     public function rememberProgress($columns = ["*"]) {
 
         $cacheEnabled = config('perfectly-cache.enabled', true);
-        $cacheStore = config('perfectly-cache.store', 'perfectly-cache');
+        $cacheTag = config('perfectly-cache.tag', 'pc');
 
         if ($cacheEnabled && $this->isCacheEnable && ! $this->cacheSkip) {
 
             $this->cacheKey = PerfectlyCache::generateCacheKey($this->getTable(), $this->toSql(), $this->getBindings(), $this->getCacheMinutes());
 
             $calculatedCacheMinutes = PerfectlyCache::calcultateCacheMinutes($this->cacheMinutes);
-            $cacheKey = $this->cacheKey;
-            return Cache::store($cacheStore)->remember($this->cacheKey, $calculatedCacheMinutes, function () use($columns, $cacheKey) {
-                $filesystem = new Filesystem();
-                $filesystem->put(Storage::disk('perfectly-cache')->path('') . "$cacheKey", "");
+            return Cache::tags($cacheTag)->remember($this->cacheKey, $calculatedCacheMinutes, function () use ($columns) {
+
+                $pck = Cache::get("perfectly_cache_keys", []);
+
+                array_push($pck, $this->cacheKey);
+
+                Cache::forever("perfectly_cache_keys", array_values(array_unique($pck)));
+
                 return parent::get($columns);
             });
         }

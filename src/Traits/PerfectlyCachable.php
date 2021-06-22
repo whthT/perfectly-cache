@@ -31,15 +31,6 @@ trait PerfectlyCachable
         return new EloquentBuilder($query);
     }
 
-    public function setModel(PerfectlyCache $model)
-    {
-        $this->model = $model;
-
-        $this->query->from($model->getTable());
-
-        return $this;
-    }
-
     public function newModelQuery()
     {
         return $this->newEloquentBuilder(
@@ -60,15 +51,7 @@ trait PerfectlyCachable
     {
         $this->controlForCache($event);
 
-        if (! isset($this->dispatchesEvents[$event])) {
-            return;
-        }
-
-        $result = static::$dispatcher->$method(new $this->dispatchesEvents[$event]($this));
-
-        if (! is_null($result)) {
-            return $result;
-        }
+        return parent::fireCustomModelEvent($event, $method);
     }
 
     public function reloadCache() {

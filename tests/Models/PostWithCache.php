@@ -17,4 +17,5 @@ class PostWithCache extends Model
     use PerfectlyCachable;
 
     protected $table = "posts";
+    public $timestamps = false;
 }

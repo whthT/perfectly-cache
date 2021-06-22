@@ -22,6 +22,6 @@ return [
         "deleted"
     ],
 
-    'store' => 'perfectly-cache', // perfectly-cache is default cache store, Usable: database, file, array, etc.
+    'tag' => 'pc',
 
 ];
