@@ -57,14 +57,13 @@ class QueryBuilder extends Builder
     public function rememberProgress($columns = ["*"]) {
 
         $cacheEnabled = config('perfectly-cache.enabled', true);
-        $cacheTag = config('perfectly-cache.tag', 'pc');
 
         if ($cacheEnabled && $this->isCacheEnable && ! $this->cacheSkip) {
 
             $this->cacheKey = PerfectlyCache::generateCacheKey($this->getTable(), $this->toSql(), $this->getBindings(), $this->getCacheMinutes());
 
             $calculatedCacheMinutes = PerfectlyCache::calcultateCacheMinutes($this->cacheMinutes);
-            return Cache::tags($cacheTag)->remember($this->cacheKey, $calculatedCacheMinutes, function () use ($columns) {
+            return Cache::remember($this->cacheKey, $calculatedCacheMinutes, function () use ($columns) {
 
                 $pck = Cache::get("perfectly_cache_keys", []);
 

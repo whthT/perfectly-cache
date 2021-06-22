@@ -72,7 +72,6 @@ class PerfectlyCache
      */
     public static function clearCacheByTable(...$tables) {
         $tables = collect($tables)->flatten()->toArray();
-        $tag = config('perfectly-cache.tag', 'pc');
         $keys = Cache::get("perfectly_cache_keys", []);
 
         $keysToBeForget = array_filter($keys, function ($key) use ($tables) {
@@ -82,7 +81,7 @@ class PerfectlyCache
         });
 
         foreach ($keysToBeForget as $key) {
-            Cache::tags($tag)->forget($key);
+            Cache::forget($key);
         }
 
         $indexes = array_filter(Cache::get("perfectly_cache_keys", []), function ($value) use ($keysToBeForget) {
@@ -95,10 +94,14 @@ class PerfectlyCache
     }
 
     public static function clearAllCaches() {
-        $tag = config('perfectly-cache.tag', 'pc');
-        $total = count(Cache::get("perfectly_cache_keys", []));
+
+        $keys = Cache::get("perfectly_cache_keys", []);
+
+        $total = count($keys);
         Cache::forget("perfectly_cache_keys");
-        Cache::tags($tag)->flush();
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
 
         return $total;
     }

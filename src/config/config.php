@@ -21,7 +21,4 @@ return [
         "updated",
         "deleted"
     ],
-
-    'tag' => 'pc',
-
 ];

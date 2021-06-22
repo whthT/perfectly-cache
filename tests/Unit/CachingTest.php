@@ -62,13 +62,13 @@ class CachingTest extends TestCase
         $usersKey = Cache::get("perfectly_cache_keys", [])[0];
         $postsKey = Cache::get("perfectly_cache_keys", [])[1];
 
-        $this->assertNotNull(Cache::tags(config('perfectly-cache.tag'))->get($usersKey));
-        $this->assertNotNull(Cache::tags(config('perfectly-cache.tag'))->get($postsKey));
+        $this->assertNotNull(Cache::get($usersKey));
+        $this->assertNotNull(Cache::get($postsKey));
 
         $this->travel(6)->minutes();
 
-        $this->assertNotNull(Cache::tags(config('perfectly-cache.tag'))->get($usersKey));
-        $this->assertNull(Cache::tags(config('perfectly-cache.tag'))->get($postsKey));
+        $this->assertNotNull(Cache::get($usersKey));
+        $this->assertNull(Cache::get($postsKey));
 
     }
 
@@ -77,16 +77,16 @@ class CachingTest extends TestCase
         $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
         $usersKey = Cache::get("perfectly_cache_keys", [])[0];
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::has($usersKey));
 
         $this->travel(29)->minutes();
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::has($usersKey));
 
         $this->travelBack();
         $this->travel(31)->minutes();
 
-        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertFalse(Cache::has($usersKey));
 
     }
 
@@ -95,16 +95,16 @@ class CachingTest extends TestCase
         $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
         $usersKey = Cache::get("perfectly_cache_keys", [])[0];
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::has($usersKey));
 
         $this->travel(9)->minutes();
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertTrue(Cache::has($usersKey));
 
         $this->travelBack();
         $this->travel(11)->minutes();
 
-        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
+        $this->assertFalse(Cache::has($usersKey));
     }
 
     public function test_forget_cache_on_record_created() {
@@ -115,8 +115,8 @@ class CachingTest extends TestCase
         $usersKey = Cache::get("perfectly_cache_keys", [])[0];
         $postsKey = Cache::get("perfectly_cache_keys", [])[2];
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+        $this->assertTrue(Cache::has($usersKey));
+        $this->assertTrue(Cache::has($postsKey));
 
         UserWithCache::create([
             "name" => "Test"
@@ -124,8 +124,8 @@ class CachingTest extends TestCase
 
         $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
 
-        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+        $this->assertFalse(Cache::has($usersKey));
+        $this->assertTrue(Cache::has($postsKey));
     }
 
     public function test_forget_cache_on_record_updated() {
@@ -136,8 +136,8 @@ class CachingTest extends TestCase
         $usersKey = Cache::get("perfectly_cache_keys", [])[0];
         $postsKey = Cache::get("perfectly_cache_keys", [])[2];
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+        $this->assertTrue(Cache::has($usersKey));
+        $this->assertTrue(Cache::has($postsKey));
 
         $user->update([
             "name" => "Test 31123"
@@ -145,8 +145,8 @@ class CachingTest extends TestCase
 
         $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
 
-        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+        $this->assertFalse(Cache::has($usersKey));
+        $this->assertTrue(Cache::has($postsKey));
     }
 
     public function test_forget_cache_on_record_deleted() {
@@ -157,14 +157,15 @@ class CachingTest extends TestCase
         $usersKey = Cache::get("perfectly_cache_keys", [])[0];
         $postsKey = Cache::get("perfectly_cache_keys", [])[2];
 
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+        $this->assertTrue(Cache::has($usersKey));
+        $this->assertTrue(Cache::has($postsKey));
 
         $user->delete();
 
         $this->assertCount(1, Cache::get("perfectly_cache_keys", []));
 
-        $this->assertFalse(Cache::tags(config('perfectly-cache.tag'))->has($usersKey));
-        $this->assertTrue(Cache::tags(config('perfectly-cache.tag'))->has($postsKey));
+        $this->assertFalse(Cache::has($usersKey));
+        $this->assertTrue(Cache::has($postsKey));
     }
+
 }
