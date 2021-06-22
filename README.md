@@ -59,9 +59,6 @@ return [
         "updated",
         "deleted"
     ],
-
-    'tag' => 'pc', // cache tag
-
 ];
 
 ```
